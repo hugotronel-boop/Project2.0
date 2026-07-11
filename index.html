@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>⚔️ OPÉRATION : PROJECT HUGO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wood-dark:#1a120b;
+    --wood:#3a2a1a;
+    --wood-light:#6b4423;
+    --parchment:#ecdfc0;
+    --parchment-dark:#d9c69a;
+    --ink:#2b1d0e;
+    --gold:#d4a017;
+    --gold-bright:#f1c948;
+    --green:#4a7c3f;
+    --green-bright:#6fae5c;
+    --red:#a13d2b;
+    --red-bright:#c9553d;
+    --teal:#3d6b6b;
+    --lock:#8a8070;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--wood-dark);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 2px, transparent 2px, transparent 4px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px);
+    color:var(--ink);
+    font-family:'VT323', monospace;
+    font-size:22px;
+    line-height:1.25;
+    min-height:100vh;
+    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+    -webkit-user-select:none; user-select:none;
+  }
+  .pixel-font{ font-family:'Press Start 2P', monospace; }
+
+  /* ---------- top bar ---------- */
+  #topbar{
+    position:sticky; top:0; z-index:20;
+    background:var(--wood);
+    border-bottom:4px solid var(--wood-dark);
+    box-shadow:0 4px 0 rgba(0,0,0,0.4);
+    padding:10px 12px calc(10px + env(safe-area-inset-top)/3) 12px;
+    padding-top: max(10px, env(safe-area-inset-top));
+    color:var(--gold-bright);
+  }
+  #topbar .title{
+    font-family:'Press Start 2P', monospace;
+    font-size:11px;
+    color:var(--gold-bright);
+    text-shadow:2px 2px 0 var(--wood-dark);
+    text-align:center;
+    letter-spacing:1px;
+    margin-bottom:8px;
+  }
+  .statrow{ display:flex; gap:8px; justify-content:space-between; align-items:center;}
+  .statchip{
+    flex:1; background:var(--wood-dark); border:2px solid var(--gold); border-radius:2px;
+    padding:4px 6px; text-align:center; font-size:16px; color:var(--parchment);
+  }
+  .statchip b{ display:block; font-family:'Press Start 2P'; font-size:10px; color:var(--gold-bright); margin-bottom:2px;}
+  #xpbar-wrap{ margin-top:8px; }
+  #xpbar-outer{
+    height:16px; background:var(--wood-dark); border:2px solid var(--gold);
+    position:relative; overflow:hidden; image-rendering:pixelated;
+  }
+  #xpbar-inner{
+    height:100%; background:repeating-linear-gradient(90deg, var(--green-bright) 0 6px, var(--green) 6px 12px);
+    width:0%; transition:width .5s steps(12);
+  }
+  #xplabel{ font-size:13px; text-align:center; color:var(--parchment-dark); margin-top:2px;}
+
+  /* ---------- layout ---------- */
+  main{ padding:14px 12px 20px; max-width:520px; margin:0 auto; }
+  .screen{ display:none; }
+  .screen.active{ display:block; animation:fadein .25s steps(6); }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .panel{
+    background:var(--parchment);
+    border:4px solid var(--wood-light);
+    box-shadow: inset 0 0 0 2px var(--parchment-dark), 4px 4px 0 rgba(0,0,0,0.45);
+    border-radius:2px;
+    padding:14px;
+    margin-bottom:16px;
+    position:relative;
+  }
+  .panel h2{
+    font-family:'Press Start 2P'; font-size:13px; margin:0 0 10px 0; color:var(--wood-light);
+    border-bottom:3px dashed var(--wood-light); padding-bottom:8px;
+  }
+  .panel h3{
+    font-family:'Press Start 2P'; font-size:10px; margin:14px 0 8px; color:var(--red);
+  }
+  .sub{ color:#5a4a30; font-size:16px; margin:-4px 0 10px; }
+
+  /* weight input */
+  .weightrow{ display:flex; gap:8px; align-items:center; margin-bottom:6px;}
+  .weightrow input{
+    flex:1; font-family:'VT323'; font-size:24px; text-align:center;
+    background:#fff8e6; border:3px solid var(--wood-light); padding:6px; border-radius:2px; color:var(--ink);
+  }
+  .btn{
+    font-family:'Press Start 2P'; font-size:10px; cursor:pointer;
+    background:var(--gold); color:var(--wood-dark); border:3px solid var(--wood-light);
+    box-shadow:3px 3px 0 rgba(0,0,0,0.4);
+    padding:10px 12px; border-radius:2px; text-align:center;
+    transition:transform .05s;
+  }
+  .btn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 rgba(0,0,0,0.4); }
+  .btn.small{ font-size:9px; padding:8px 10px; }
+  .btn.green{ background:var(--green-bright); }
+  .btn.red{ background:var(--red-bright); color:#fff; }
+  .btn.teal{ background:var(--teal); color:#fff; }
+  .btn.disabled{ opacity:.45; pointer-events:none; }
+  .btn-row{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  /* level path (signature element) */
+  .levelpath{ position:relative; padding:10px 4px 4px; }
+  .levelnode{
+    display:flex; gap:10px; align-items:flex-start; position:relative;
+    padding:10px 0 26px 0; margin-left:4px;
+  }
+  .levelnode:last-child{ padding-bottom:6px; }
+  .levelnode::before{ /* dotted trail */
+    content:''; position:absolute; left:18px; top:38px; bottom:-4px; width:0;
+    border-left:4px dotted var(--wood-light);
+  }
+  .levelnode:last-child::before{ display:none; }
+  .node-badge{
+    width:38px; height:38px; min-width:38px; border-radius:50%;
+    background:var(--lock); border:3px solid var(--wood-light);
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+    box-shadow:2px 2px 0 rgba(0,0,0,0.35);
+  }
+  .levelnode.done .node-badge{ background:var(--green-bright); }
+  .levelnode.current .node-badge{ background:var(--gold-bright); animation:pulse 1s infinite steps(6); }
+  @keyframes pulse{ 0%,100%{ box-shadow:2px 2px 0 rgba(0,0,0,0.35);} 50%{ box-shadow:2px 2px 0 rgba(0,0,0,0.35), 0 0 0 4px rgba(241,201,72,0.5);} }
+  .node-body b{ font-size:19px; }
+  .node-body .kg{ font-family:'Press Start 2P'; font-size:11px; color:var(--wood-light); }
+  .node-body .rew{ font-size:16px; color:#4a3a20; }
+  .tag{
+    display:inline-block; font-family:'Press Start 2P'; font-size:8px; padding:3px 6px;
+    border-radius:2px; margin-left:6px; vertical-align:middle;
+  }
+  .tag.done{ background:var(--green-bright); color:#123; }
+  .tag.now{ background:var(--gold-bright); color:#432; }
+  .tag.locked{ background:var(--lock); color:#fff; }
+
+  /* quest list */
+  .quest{
+    display:flex; align-items:center; gap:10px; padding:9px 6px;
+    border-bottom:2px dashed var(--parchment-dark); cursor:pointer;
+  }
+  .quest:last-child{ border-bottom:none; }
+  .checkbox{
+    width:26px; height:26px; min-width:26px; border:3px solid var(--wood-light);
+    background:#fff8e6; display:flex; align-items:center; justify-content:center;
+    font-size:16px; border-radius:2px;
+  }
+  .quest.checked .checkbox{ background:var(--green-bright); }
+  .quest .label{ flex:1; font-size:18px; }
+  .quest.checked .label{ text-decoration:line-through; color:#6a6a50; }
+  .xp-pill{
+    font-family:'Press Start 2P'; font-size:9px; background:var(--wood-light); color:var(--gold-bright);
+    padding:4px 6px; border-radius:2px; white-space:nowrap;
+  }
+
+  /* boss cards */
+  .bosscard{
+    background:#f6e9c8; border:3px solid var(--red); border-radius:2px; padding:12px; margin-bottom:12px;
+  }
+  .bosscard h4{ font-family:'Press Start 2P'; font-size:11px; color:var(--red); margin:0 0 6px;}
+  .bosscard p{ margin:4px 0 10px; font-size:17px; }
+
+  /* classes grid */
+  .classgrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .classcard{
+    border:3px solid var(--wood-light); background:#f6e9c8; border-radius:2px; padding:10px; text-align:center;
+  }
+  .classcard.active{ background:var(--gold-bright); box-shadow:2px 2px 0 rgba(0,0,0,.3); }
+  .classcard .icon{ font-size:26px; }
+  .classcard b{ display:block; font-family:'Press Start 2P'; font-size:9px; margin:6px 0 4px; }
+  .classcard p{ font-size:14px; margin:0; color:#4a3a20; }
+
+  /* achievements */
+  .ach{ display:flex; align-items:center; gap:10px; padding:9px 6px; border-bottom:2px dashed var(--parchment-dark); }
+  .ach:last-child{ border-bottom:none; }
+  .ach .medal{ font-size:26px; }
+  .ach .info{ flex:1; }
+  .ach .info b{ font-size:18px; display:block; }
+  .ach .info span{ font-size:14px; color:#5a4a30; }
+  .ach.claimed{ opacity:.6; }
+
+  /* challenge */
+  .challengebox{
+    background:#f6e9c8; border:3px dashed var(--teal); border-radius:2px; padding:14px; text-align:center;
+  }
+  .challengebox .txt{ font-size:19px; margin:8px 0 12px; color:var(--teal); font-weight:bold;}
+
+  /* final quest */
+  .finalprog-outer{ height:20px; background:var(--wood-dark); border:2px solid var(--gold); margin-bottom:14px;}
+  .finalprog-inner{ height:100%; background:repeating-linear-gradient(90deg, var(--gold-bright) 0 6px, var(--gold) 6px 12px); width:0%; transition:width .4s steps(10);}
+
+  footer.note{ text-align:center; font-size:13px; color:#8a7c5c; padding:10px 20px 4px; }
+
+  /* bottom tab bar */
+  nav#tabbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    background:var(--wood); border-top:4px solid var(--wood-dark);
+    display:flex; padding:6px 4px calc(6px + env(safe-area-inset-bottom)) 4px;
+  }
+  nav#tabbar button{
+    flex:1; background:none; border:none; color:var(--parchment-dark);
+    font-family:'Press Start 2P'; font-size:8px; display:flex; flex-direction:column;
+    align-items:center; gap:4px; padding:8px 2px; border-radius:4px;
+  }
+  nav#tabbar button .ic{ font-size:20px; }
+  nav#tabbar button.active{ color:var(--gold-bright); background:rgba(212,160,23,0.15); }
+
+  .toast{
+    position:fixed; top:14px; left:50%; transform:translate(-50%,-140%);
+    background:var(--gold-bright); color:var(--wood-dark); font-family:'Press Start 2P';
+    font-size:11px; padding:12px 16px; border:3px solid var(--wood-light); border-radius:3px;
+    box-shadow:3px 3px 0 rgba(0,0,0,.4); z-index:100; transition:transform .35s steps(8);
+    text-align:center; max-width:80%;
+  }
+  .toast.show{ transform:translate(-50%,0); }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="title">⚔️ PROJECT HUGO</div>
+  <div class="statrow">
+    <div class="statchip"><b>NIVEAU</b><span id="hud-level">1</span></div>
+    <div class="statchip"><b>POIDS</b><span id="hud-weight">96 kg</span></div>
+    <div class="statchip"><b>XP TOTAL</b><span id="hud-xp">0</span></div>
+  </div>
+  <div id="xpbar-wrap">
+    <div id="xpbar-outer"><div id="xpbar-inner"></div></div>
+    <div id="xplabel">0 / 100 vers le prochain palier</div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ===== ACCUEIL ===== -->
+  <section class="screen active" id="screen-accueil">
+    <div class="panel">
+      <h2>🏆 OBJECTIF</h2>
+      <p class="sub">Débloquer la version « Hugo 2.0 »</p>
+      <div class="weightrow">
+        <span class="pixel-font" style="font-size:10px;color:var(--wood-light);">POIDS</span>
+        <input type="number" id="input-weight" step="0.1" inputmode="decimal">
+        <span class="pixel-font" style="font-size:10px;color:var(--wood-light);">KG</span>
+      </div>
+      <div class="btn-row">
+        <div class="btn green small" id="btn-save-weight">✅ Mettre à jour</div>
+      </div>
+      <p class="sub" style="margin-top:10px;">📏 Taille : 1,87 m &nbsp;|&nbsp; Départ : 96 kg</p>
+    </div>
+
+    <div class="panel">
+      <h2>🗺️ LA VOIE VERS HUGO 2.0</h2>
+      <div class="levelpath" id="levelpath"></div>
+    </div>
+  </section>
+
+  <!-- ===== QUETES ===== -->
+  <section class="screen" id="screen-quetes">
+    <div class="panel">
+      <h2>📜 QUÊTES DU JOUR</h2>
+      <p class="sub" id="today-date"></p>
+      <h3>🌞 Matin</h3>
+      <div id="q-morning"></div>
+      <h3 id="q-theme-title">🚶 Journée</h3>
+      <div id="q-theme"></div>
+      <h3>🌙 Soir</h3>
+      <div id="q-evening"></div>
+      <p class="sub" style="margin-top:10px;">🔥 Série en cours : <b id="streak-count">0</b> jour(s)</p>
+    </div>
+
+    <div class="panel">
+      <h2>👹 LES BOSS</h2>
+      <div class="bosscard">
+        <h4>👹 Boss du samedi — Un resto</h4>
+        <p>Mission : manger normalement, sans te gaver.</p>
+        <div class="btn-row">
+          <div class="btn red small" id="btn-boss-week">⚔️ Victoire (+100 XP)</div>
+        </div>
+      </div>
+      <div class="bosscard">
+        <h4>🎂 Boss anniversaire — Manger du gâteau</h4>
+        <p>Aucune culpabilité. Tu reprends le programme demain.</p>
+        <div class="btn-row">
+          <div class="btn teal small" id="btn-boss-anniv">🎂 Affronté sans culpabilité</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🎲 DÉFI DE LA SEMAINE</h2>
+      <div class="challengebox" id="challengebox">
+        <div class="txt" id="challenge-text">Aucun défi tiré cette semaine.</div>
+        <div class="btn-row" style="justify-content:center;">
+          <div class="btn small" id="btn-draw-challenge">🎲 Tirer un défi</div>
+          <div class="btn green small" id="btn-complete-challenge" style="display:none;">✅ Défi relevé (+40 XP)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GUILDE ===== -->
+  <section class="screen" id="screen-guilde">
+    <div class="panel">
+      <h2>🛡️ CHOISIS TA CLASSE</h2>
+      <p class="sub">Tu peux en débloquer plusieurs.</p>
+      <div class="classgrid" id="classgrid"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🥇 SUCCÈS</h2>
+      <div id="ach-list"></div>
+    </div>
+  </section>
+
+  <!-- ===== QUETE FINALE ===== -->
+  <section class="screen" id="screen-final">
+    <div class="panel">
+      <h2>🏆 MISSION : « PAPA EN PLEINE FORME »</h2>
+      <p class="sub">À accomplir avant l'arrivée d'Agathe</p>
+      <div class="finalprog-outer"><div class="finalprog-inner" id="final-progress"></div></div>
+      <div id="final-list"></div>
+    </div>
+    <footer class="note">Chaque case cochée est un pas de plus vers Hugo 2.0. 💪</footer>
+  </section>
+
+</main>
+
+<nav id="tabbar">
+  <button data-screen="accueil" class="active"><span class="ic">🏠</span>QG</button>
+  <button data-screen="quetes"><span class="ic">📜</span>QUÊTES</button>
+  <button data-screen="guilde"><span class="ic">🛡️</span>GUILDE</button>
+  <button data-screen="final"><span class="ic">🏆</span>FINALE</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  const STORAGE_KEY = "hugo-quest-state";
+  let saveTimer = null;
+
+  // ---------- data definitions ----------
+  const LEVELS = [
+    {n:1, kg:96, reward:"Tu démarres ton aventure."},
+    {n:2, kg:94, reward:"🥤 Un restaurant ou un dessert que tu apprécies."},
+    {n:3, kg:92, reward:"🎁 Tu t'offres un nouveau t-shirt."},
+    {n:4, kg:90, reward:"🎁 Une sortie avec Charline (ciné, resto, activité)."},
+    {n:"MAX", kg:88, reward:"🏆 Une grosse récompense de ton choix (chaussures, montre, jeu vidéo...)."}
+  ];
+
+  const MORNING = [
+    {id:"eau_matin", label:"Boire un grand verre d'eau", xp:10},
+    {id:"petitdej", label:"Petit-déjeuner équilibré", xp:10},
+    {id:"lit", label:"Faire son lit", xp:5}
+  ];
+  const EVENING = [
+    {id:"noecran", label:"Pas d'écran 30 min avant de dormir", xp:10},
+    {id:"sommeil7h", label:"7 h de sommeil", xp:20}
+  ];
+
+  // Thème + quêtes spécifiques par jour de semaine (0=Dimanche ... 6=Samedi)
+  // Chaque lundi aura toujours les mêmes quêtes, chaque mardi les mêmes, etc.
+  const WEEKDAY_THEMES = {
+    1: {icon:"⚔️", title:"Jour du Guerrier", quests:[
+      {id:"pas8000", label:"8 000 pas", xp:30},
+      {id:"nosoda", label:"Aucun soda", xp:15},
+      {id:"seance", label:"Séance complète", xp:50}
+    ]},
+    2: {icon:"🏃", title:"Jour de l'Éclaireur", quests:[
+      {id:"pas10000", label:"10 000 pas", xp:35},
+      {id:"eau2l", label:"2 litres d'eau", xp:20},
+      {id:"nogrignotage", label:"Aucun grignotage", xp:15}
+    ]},
+    3: {icon:"💪", title:"Jour de Sport", quests:[
+      {id:"pas8000b", label:"8 000 pas", xp:30},
+      {id:"nosodab", label:"Aucun soda", xp:15},
+      {id:"seanceb", label:"Séance complète", xp:50}
+    ]},
+    4: {icon:"🍳", title:"Jour du Chef", quests:[
+      {id:"cuisiner", label:"Cuisiner tous ses repas", xp:20},
+      {id:"eau2lb", label:"2 litres d'eau", xp:20},
+      {id:"nogrignotageb", label:"Aucun grignotage", xp:15}
+    ]},
+    5: {icon:"⚔️", title:"Jour du Guerrier", quests:[
+      {id:"pas8000c", label:"8 000 pas", xp:30},
+      {id:"nosodac", label:"Aucun soda", xp:15},
+      {id:"seancec", label:"Séance complète", xp:50}
+    ]},
+    6: {icon:"👹", title:"Jour du Boss (samedi)", quests:[
+      {id:"pas8000d", label:"8 000 pas", xp:30},
+      {id:"eau2lc", label:"2 litres d'eau", xp:20}
+    ]},
+    0: {icon:"😴", title:"Jour du Sage", quests:[
+      {id:"pas7000", label:"7 000 pas", xp:25},
+      {id:"nogrignotagec", label:"Aucun grignotage", xp:15},
+      {id:"reposactif", label:"Repos actif (étirements, marche tranquille)", xp:15}
+    ]}
+  };
+
+  function getActiveDailyQuests(date){
+    const theme = WEEKDAY_THEMES[date.getDay()];
+    return [...MORNING, ...theme.quests, ...EVENING];
+  }
+
+  const CLASSES = [
+    {id:"guerrier", icon:"🛡️", label:"Guerrier", desc:"Tu ne rates jamais une séance."},
+    {id:"eclaireur", icon:"🏃", label:"Éclaireur", desc:"Plus de 10 000 pas / jour."},
+    {id:"chef", icon:"🍳", label:"Chef", desc:"Tu cuisines tous tes repas."},
+    {id:"sage", icon:"😴", label:"Sage", desc:"Tu dors 7h+ chaque nuit."}
+  ];
+
+  const ACHIEVEMENTS = [
+    {id:"streak7", medal:"🥇", label:"7 jours d'affilée", xp:150, auto:true},
+    {id:"kilo1", medal:"🥈", label:"Premier kilo perdu", xp:250, auto:false},
+    {id:"month1", medal:"🥉", label:"Premier mois terminé", xp:500, auto:false},
+    {id:"pants", medal:"🏅", label:"Premier pantalon devenu trop grand", xp:500, auto:false},
+    {id:"streak30", medal:"🔥", label:"30 jours sans abandon", xp:1000, auto:true}
+  ];
+
+  const CHALLENGES = [
+    "Pas d'ascenseur pendant 7 jours",
+    "Boire uniquement de l'eau",
+    "10 000 pas tous les jours",
+    "Manger un légume à chaque repas",
+    "Faire une balade avec Charline",
+    "Préparer un repas maison"
+  ];
+
+  const FINAL_QUEST = [
+    {id:"kg88", label:"Atteindre 88 kg", auto:true},
+    {id:"pompes20", label:"Faire 20 pompes d'affilée", auto:false},
+    {id:"gainage2", label:"Tenir 2 minutes en gainage", auto:false},
+    {id:"courir5", label:"Courir 5 km sans t'arrêter (ou marcher 8 km)", auto:false},
+    {id:"vetements", label:"Te sentir bien dans tes vêtements", auto:false}
+  ];
+
+  // ---------- state ----------
+  function todayKey(d){
+    d = d || new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function isoWeekKey(d){
+    d = d || new Date();
+    const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = (dt.getUTCDay() + 6) % 7;
+    dt.setUTCDate(dt.getUTCDate() - dayNum + 3);
+    const firstThursday = new Date(Date.UTC(dt.getUTCFullYear(),0,4));
+    const week = 1 + Math.round(((dt - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay()+6)%7)) / 7);
+    return dt.getUTCFullYear() + "-W" + String(week).padStart(2,"0");
+  }
+
+  function defaultState(){
+    return {
+      weight: 96,
+      xpTotal: 0,
+      currentDate: todayKey(),
+      dailyChecks: {},
+      streak: 0,
+      classes: {},
+      achievements: {},
+      bossWeekKey: null,
+      weeklyChallenge: {weekKey:null, text:null, completed:false},
+      finalQuest: {}
+    };
+  }
+
+  let state = defaultState();
+
+  async function saveState(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }catch(e){ console.error("save failed", e); }
+    }, 150);
+  }
+
+  async function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){ state = Object.assign(defaultState(), JSON.parse(raw)); }
+    }catch(e){ /* no saved state yet */ }
+    rolloverDayIfNeeded();
+  }
+
+  function rolloverDayIfNeeded(){
+    const tk = todayKey();
+    if(state.currentDate !== tk){
+      const prevDate = new Date(state.currentDate + "T12:00:00");
+      const prevQuests = getActiveDailyQuests(prevDate);
+      const wasFull = prevQuests.every(q => state.dailyChecks[q.id]);
+      if(wasFull){ state.streak = (state.streak||0) + 1; }
+      else { state.streak = 0; }
+      state.dailyChecks = {};
+      state.currentDate = tk;
+    }
+  }
+
+  // ---------- toast ----------
+  let toastTimer = null;
+  function showToast(msg){
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove("show"), 1800);
+  }
+
+  function addXP(amount){
+    state.xpTotal = Math.max(0, state.xpTotal + amount);
+    checkAutoAchievements();
+    saveState();
+  }
+
+  function checkAutoAchievements(){
+    ACHIEVEMENTS.forEach(a=>{
+      if(!a.auto || state.achievements[a.id]) return;
+      if(a.id === "streak7" && state.streak >= 7){ claimAchievement(a, true); }
+      if(a.id === "streak30" && state.streak >= 30){ claimAchievement(a, true); }
+    });
+  }
+
+  function claimAchievement(a, silentXP){
+    if(state.achievements[a.id]) return;
+    state.achievements[a.id] = true;
+    if(!silentXP){ state.xpTotal += a.xp; }
+    else { state.xpTotal += a.xp; }
+    showToast("🏅 SUCCÈS : " + a.label + " (+" + a.xp + " XP)");
+    saveState();
+    renderAll();
+  }
+
+  function getLevelInfo(weight){
+    for(let i=0;i<LEVELS.length;i++){
+      if(weight <= LEVELS[i].kg) continue;
+    }
+    let current = LEVELS[0];
+    for(const lv of LEVELS){
+      if(weight <= lv.kg){ current = lv; }
+    }
+    // find highest level reached (weight <= kg), lowest kg reached wins (closest to MAX)
+    let reached = LEVELS[0];
+    for(const lv of LEVELS){ if(weight <= lv.kg) reached = lv; }
+    return reached;
+  }
+
+  // ---------- rendering ----------
+  function renderHUD(){
+    const lvl = getLevelInfo(state.weight);
+    document.getElementById("hud-level").textContent = lvl.n;
+    document.getElementById("hud-weight").textContent = state.weight + " kg";
+    document.getElementById("hud-xp").textContent = state.xpTotal;
+    const mod = state.xpTotal % 100;
+    document.getElementById("xpbar-inner").style.width = mod + "%";
+    document.getElementById("xplabel").textContent = mod + " / 100 vers le prochain palier";
+    document.getElementById("input-weight").value = state.weight;
+  }
+
+  function renderLevelPath(){
+    const wrap = document.getElementById("levelpath");
+    wrap.innerHTML = "";
+    let currentAssigned = false;
+    // determine current: first level (in order 1..MAX) not yet reached
+    let currentIdx = LEVELS.findIndex(lv => state.weight > lv.kg);
+    if(currentIdx === -1) currentIdx = LEVELS.length; // all reached
+    LEVELS.forEach((lv, idx)=>{
+      const reached = state.weight <= lv.kg;
+      const isCurrent = idx === currentIdx;
+      const div = document.createElement("div");
+      div.className = "levelnode" + (reached ? " done" : (isCurrent ? " current" : ""));
+      const badgeIcon = reached ? "✅" : (isCurrent ? "👉" : "🔒");
+      let tag = reached ? '<span class="tag done">FAIT</span>' : (isCurrent ? '<span class="tag now">EN COURS</span>' : '<span class="tag locked">VERROUILLÉ</span>');
+      div.innerHTML = `
+        <div class="node-badge">${badgeIcon}</div>
+        <div class="node-body">
+          <b>Niveau ${lv.n}${tag}</b><br>
+          <span class="kg">${lv.kg} kg</span>
+          <div class="rew">${lv.reward}</div>
+        </div>`;
+      wrap.appendChild(div);
+    });
+  }
+
+  function renderQuestGroup(containerId, list){
+    const el = document.getElementById(containerId);
+    el.innerHTML = "";
+    list.forEach(q=>{
+      const checked = !!state.dailyChecks[q.id];
+      const row = document.createElement("div");
+      row.className = "quest" + (checked ? " checked" : "");
+      row.innerHTML = `<div class="checkbox">${checked ? "✔" : ""}</div><div class="label">${q.label}</div><div class="xp-pill">+${q.xp} XP</div>`;
+      row.addEventListener("click", ()=>{
+        const isChecked = !!state.dailyChecks[q.id];
+        if(isChecked){ delete state.dailyChecks[q.id]; addXP(-q.xp); }
+        else { state.dailyChecks[q.id] = true; addXP(q.xp); }
+        renderAll();
+      });
+      el.appendChild(row);
+    });
+  }
+
+  function renderQuetes(){
+    const now = new Date();
+    document.getElementById("today-date").textContent = "📅 " + now.toLocaleDateString("fr-FR", {weekday:"long", day:"numeric", month:"long"});
+    const theme = WEEKDAY_THEMES[now.getDay()];
+    document.getElementById("q-theme-title").textContent = theme.icon + " " + theme.title;
+    renderQuestGroup("q-morning", MORNING);
+    renderQuestGroup("q-theme", theme.quests);
+    renderQuestGroup("q-evening", EVENING);
+    document.getElementById("streak-count").textContent = state.streak || 0;
+
+    const wk = isoWeekKey();
+    const bossDone = state.bossWeekKey === wk;
+    const bossBtn = document.getElementById("btn-boss-week");
+    bossBtn.textContent = bossDone ? "✔️ Déjà validé cette semaine" : "⚔️ Victoire (+100 XP)";
+    bossBtn.classList.toggle("disabled", bossDone);
+
+    const ch = state.weeklyChallenge;
+    const drawBtn = document.getElementById("btn-draw-challenge");
+    const doneBtn = document.getElementById("btn-complete-challenge");
+    if(ch.weekKey === wk && ch.text){
+      document.getElementById("challenge-text").textContent = "🎲 " + ch.text;
+      drawBtn.style.display = "none";
+      doneBtn.style.display = ch.completed ? "none" : "inline-block";
+      if(ch.completed){ document.getElementById("challenge-text").textContent = "✅ " + ch.text + " — Relevé !"; }
+    } else {
+      document.getElementById("challenge-text").textContent = "Aucun défi tiré cette semaine.";
+      drawBtn.style.display = "inline-block";
+      doneBtn.style.display = "none";
+    }
+  }
+
+  function renderGuilde(){
+    const grid = document.getElementById("classgrid");
+    grid.innerHTML = "";
+    CLASSES.forEach(c=>{
+      const active = !!state.classes[c.id];
+      const div = document.createElement("div");
+      div.className = "classcard" + (active ? " active" : "");
+      div.innerHTML = `<div class="icon">${c.icon}</div><b>${c.label}</b><p>${c.desc}</p>`;
+      div.addEventListener("click", ()=>{
+        state.classes[c.id] = !state.classes[c.id];
+        showToast(state.classes[c.id] ? ("Classe débloquée : " + c.label) : ("Classe retirée : " + c.label));
+        saveState();
+        renderGuilde();
+      });
+      grid.appendChild(div);
+    });
+
+    const achList = document.getElementById("ach-list");
+    achList.innerHTML = "";
+    ACHIEVEMENTS.forEach(a=>{
+      const claimed = !!state.achievements[a.id];
+      const row = document.createElement("div");
+      row.className = "ach" + (claimed ? " claimed" : "");
+      const btnHtml = a.auto
+        ? `<span class="xp-pill">${claimed ? "OBTENU" : "AUTO"}</span>`
+        : `<div class="btn small ${claimed ? "disabled" : "green"}" data-ach="${a.id}">${claimed ? "✔️" : "Valider"}</div>`;
+      row.innerHTML = `<div class="medal">${a.medal}</div><div class="info"><b>${a.label}</b><span>+${a.xp} XP</span></div>${btnHtml}`;
+      achList.appendChild(row);
+    });
+    achList.querySelectorAll("[data-ach]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const a = ACHIEVEMENTS.find(x=>x.id===btn.dataset.ach);
+        if(a) claimAchievement(a, false);
+      });
+    });
+  }
+
+  function renderFinal(){
+    const list = document.getElementById("final-list");
+    list.innerHTML = "";
+    let doneCount = 0;
+    FINAL_QUEST.forEach(f=>{
+      let checked;
+      if(f.auto){ checked = state.weight <= 88; state.finalQuest[f.id] = checked; }
+      else { checked = !!state.finalQuest[f.id]; }
+      if(checked) doneCount++;
+      const row = document.createElement("div");
+      row.className = "quest" + (checked ? " checked" : "");
+      row.innerHTML = `<div class="checkbox">${checked ? "✔" : ""}</div><div class="label">${f.label}</div>`;
+      if(!f.auto){
+        row.addEventListener("click", ()=>{
+          state.finalQuest[f.id] = !state.finalQuest[f.id];
+          saveState();
+          renderFinal();
+        });
+      }
+      list.appendChild(row);
+    });
+    const pct = Math.round((doneCount / FINAL_QUEST.length) * 100);
+    document.getElementById("final-progress").style.width = pct + "%";
+  }
+
+  function renderAll(){
+    renderHUD();
+    renderLevelPath();
+    renderQuetes();
+    renderGuilde();
+    renderFinal();
+  }
+
+  // ---------- events ----------
+  document.getElementById("btn-save-weight").addEventListener("click", ()=>{
+    const val = parseFloat(document.getElementById("input-weight").value);
+    if(isNaN(val) || val <= 0) return;
+    const prevLevel = getLevelInfo(state.weight);
+    state.weight = val;
+    const newLevel = getLevelInfo(state.weight);
+    saveState();
+    renderAll();
+    if(newLevel.kg !== prevLevel.kg && state.weight <= newLevel.kg){
+      showToast("🎉 NIVEAU " + newLevel.n + " ATTEINT !");
+    } else {
+      showToast("Poids mis à jour : " + state.weight + " kg");
+    }
+  });
+
+  document.getElementById("btn-boss-week").addEventListener("click", ()=>{
+    const wk = isoWeekKey();
+    if(state.bossWeekKey === wk) return;
+    state.bossWeekKey = wk;
+    addXP(100);
+    showToast("⚔️ Boss du samedi vaincu ! +100 XP");
+    renderAll();
+  });
+
+  document.getElementById("btn-boss-anniv").addEventListener("click", ()=>{
+    showToast("🎂 Aucune culpabilité. On reprend demain !");
+  });
+
+  document.getElementById("btn-draw-challenge").addEventListener("click", ()=>{
+    const wk = isoWeekKey();
+    const pick = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
+    state.weeklyChallenge = {weekKey: wk, text: pick, completed:false};
+    saveState();
+    renderQuetes();
+    showToast("🎲 Nouveau défi tiré !");
+  });
+
+  document.getElementById("btn-complete-challenge").addEventListener("click", ()=>{
+    if(state.weeklyChallenge.completed) return;
+    state.weeklyChallenge.completed = true;
+    addXP(40);
+    showToast("✅ Défi relevé ! +40 XP");
+    renderQuetes();
+  });
+
+  document.querySelectorAll("#tabbar button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll("#tabbar button").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("screen-" + btn.dataset.screen).classList.add("active");
+      window.scrollTo(0,0);
+    });
+  });
+
+  // ---------- init ----------
+  loadState().then(()=>{
+    renderAll();
+  });
+})();
+</script>
+</body>
+</html>
