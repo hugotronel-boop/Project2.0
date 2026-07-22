@@ -24,7 +24,7 @@
     --lock:#8a8070;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0;height:100%;}
+  html,body{margin:0;padding:0;min-height:100%;}
   body{
     background:var(--wood-dark);
     background-image:
@@ -35,8 +35,10 @@
     font-size:22px;
     line-height:1.25;
     min-height:100vh;
-    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
     -webkit-user-select:none; user-select:none;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
   }
   .pixel-font{ font-family:'Press Start 2P', monospace; }
 
@@ -77,10 +79,14 @@
   #xplabel{ font-size:13px; text-align:center; color:var(--parchment-dark); margin-top:2px;}
 
   /* ---------- layout ---------- */
-  main{ padding:14px 12px 20px; max-width:520px; margin:0 auto; }
+  main{ padding:14px 12px 20px; max-width:520px; margin:0 auto; overflow-x:hidden; touch-action:pan-y; }
   .screen{ display:none; }
-  .screen.active{ display:block; animation:fadein .25s steps(6); }
+  .screen.active{ display:block; }
+  .screen.active.slide-right{ animation:slideInRight .28s ease-out; }
+  .screen.active.slide-left{ animation:slideInLeft .28s ease-out; }
   @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes slideInRight{ from{opacity:0; transform:translateX(38px);} to{opacity:1; transform:translateX(0);} }
+  @keyframes slideInLeft{ from{opacity:0; transform:translateX(-38px);} to{opacity:1; transform:translateX(0);} }
 
   .panel{
     background:var(--parchment);
@@ -232,6 +238,63 @@
     text-align:center; max-width:80%;
   }
   .toast.show{ transform:translate(-50%,0); }
+
+  /* history */
+  .histrow{ display:flex; align-items:center; gap:10px; padding:8px 6px; border-bottom:2px dashed var(--parchment-dark); }
+  .histrow:last-child{ border-bottom:none; }
+  .histrow .hemoji{ font-size:20px; }
+  .histrow .hday{ flex:1; font-size:17px; text-transform:capitalize; }
+  .histrow .hpct{ font-family:'Press Start 2P'; font-size:10px; color:var(--wood-light); }
+  .empty-note{ font-size:16px; color:#8a7c5c; text-align:center; padding:8px 0; }
+
+  /* dashboard */
+  .dash-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+  .dash-tile{ background:#f6e9c8; border:2px solid var(--wood-light); border-radius:2px; padding:8px; text-align:center; }
+  .dash-tile b{ display:block; font-family:'Press Start 2P'; font-size:14px; color:var(--wood-light); }
+  .dash-tile span{ font-size:13px; color:#5a4a30; }
+  .dash-bar-outer{ height:14px; background:var(--wood-dark); border:2px solid var(--gold); margin:6px 0 10px; }
+  .dash-bar-inner{ height:100%; background:repeating-linear-gradient(90deg, var(--gold-bright) 0 5px, var(--gold) 5px 10px); width:0%; transition:width .4s steps(10); }
+  .next-obj{ background:#f6e9c8; border:2px dashed var(--wood-light); border-radius:2px; padding:10px; text-align:center; }
+  .next-obj b{ font-family:'Press Start 2P'; font-size:11px; color:var(--red); display:block; margin-bottom:6px; }
+
+  /* weight chart */
+  #weight-chart{
+    width:100%; height:130px; background:var(--wood-dark); border:2px solid var(--gold);
+    display:block; margin:8px 0 10px; shape-rendering:crispEdges;
+  }
+
+  /* daily event */
+  .eventbox{
+    background:#f0e6d0; border:3px dashed var(--teal); border-radius:2px; padding:14px; text-align:center;
+  }
+  .eventbox h4{ font-family:'Press Start 2P'; font-size:11px; color:var(--teal); margin:0 0 8px; }
+  .eventbox p{ font-size:17px; margin:4px 0 10px; }
+
+  /* rewards */
+  .reward-row{
+    display:flex; align-items:center; gap:10px; padding:10px 6px; border-bottom:2px dashed var(--parchment-dark);
+  }
+  .reward-row:last-child{ border-bottom:none; }
+  .reward-row .ricon{ font-size:24px; }
+  .reward-row .rinfo{ flex:1; }
+  .reward-row .rinfo b{ font-size:18px; display:block; }
+  .reward-row .rinfo span{ font-size:14px; color:#5a4a30; }
+  .reward-row.locked{ opacity:.5; }
+  .reward-row.claimed{ opacity:.6; }
+
+  /* level up overlay */
+  #levelup-overlay{
+    position:fixed; inset:0; background:rgba(10,7,4,0.94); z-index:200;
+    display:none; align-items:center; justify-content:center; flex-direction:column;
+    text-align:center; padding:24px;
+  }
+  #levelup-overlay.show{ display:flex; animation:overlayIn .3s steps(6); }
+  @keyframes overlayIn{ from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
+  .levelup-swords{ font-size:26px; letter-spacing:8px; color:var(--gold-bright); margin-bottom:16px; animation:blink 1s steps(2) infinite; }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+  .levelup-title{ font-family:'Press Start 2P'; font-size:15px; color:var(--gold-bright); text-shadow:3px 3px 0 var(--wood-dark); margin-bottom:16px; line-height:2; }
+  .levelup-sub{ font-family:'VT323'; font-size:20px; color:#f2e8d0; margin-bottom:10px; line-height:1.5; }
+  .levelup-tap{ font-family:'Press Start 2P'; font-size:9px; color:var(--parchment-dark); margin-top:22px; }
 </style>
 </head>
 <body>
@@ -254,6 +317,24 @@
   <!-- ===== ACCUEIL ===== -->
   <section class="screen active" id="screen-accueil">
     <div class="panel">
+      <h2>📊 TABLEAU DE BORD</h2>
+      <div class="dash-grid">
+        <div class="dash-tile"><b id="dash-lvltitle">Recrue</b><span>Niveau XP</span></div>
+        <div class="dash-tile"><b id="dash-lost">0 kg</b><span>Perdus depuis le départ</span></div>
+        <div class="dash-tile"><b id="dash-streak">0</b><span>🔥 Jours de série</span></div>
+        <div class="dash-tile"><b id="dash-achcount">0/10</b><span>🏆 Succès</span></div>
+      </div>
+      <p class="sub" style="margin:0 0 4px;">Progression vers 88 kg</p>
+      <div class="dash-bar-outer"><div class="dash-bar-inner" id="dash-weightbar"></div></div>
+      <p class="sub" style="margin:0 0 4px;">📅 Aujourd'hui : <b id="dash-todaycount">0/0</b> quêtes — <b id="dash-todayxp">+0 XP</b></p>
+      <div class="dash-bar-outer"><div class="dash-bar-inner" id="dash-todaybar"></div></div>
+      <div class="next-obj">
+        <b id="dash-nextlabel">🎯 PROCHAIN OBJECTIF</b>
+        <div id="dash-nexttext"></div>
+      </div>
+    </div>
+
+    <div class="panel">
       <h2>🏆 OBJECTIF</h2>
       <p class="sub">Débloquer la version « Hugo 2.0 »</p>
       <div class="weightrow">
@@ -265,6 +346,18 @@
         <div class="btn green small" id="btn-save-weight">✅ Mettre à jour</div>
       </div>
       <p class="sub" style="margin-top:10px;">📏 Taille : 1,87 m &nbsp;|&nbsp; Départ : 96 kg</p>
+    </div>
+
+    <div class="panel">
+      <h2>📉 ÉVOLUTION DU POIDS</h2>
+      <div class="dash-grid">
+        <div class="dash-tile"><b id="wh-start">96 kg</b><span>Poids de départ</span></div>
+        <div class="dash-tile"><b id="wh-lost">0 kg</b><span>Perdus</span></div>
+        <div class="dash-tile"><b id="wh-best">96 kg</b><span>Meilleur poids</span></div>
+        <div class="dash-tile"><b id="wh-remaining">8 kg</b><span>Restant vers 88 kg</span></div>
+      </div>
+      <svg id="weight-chart" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
+      <div id="weight-history-list"></div>
     </div>
 
     <div class="panel">
@@ -284,7 +377,18 @@
       <div id="q-theme"></div>
       <h3>🌙 Soir</h3>
       <div id="q-evening"></div>
-      <p class="sub" style="margin-top:10px;">🔥 Série en cours : <b id="streak-count">0</b> jour(s)</p>
+      <p class="sub" style="margin-top:10px;">🔥 Série en cours : <b id="streak-count">0</b> jour(s) &nbsp;|&nbsp; 🏆 Meilleure : <b id="best-streak">0</b> jour(s)</p>
+    </div>
+
+    <div class="panel" id="event-panel" style="display:none;">
+      <h2>⚡ ÉVÉNEMENT DU JOUR</h2>
+      <div class="eventbox" id="eventbox"></div>
+    </div>
+
+    <div class="panel">
+      <h2>📅 HISTORIQUE</h2>
+      <p class="sub">Taux de réussite : <b id="success-rate">—</b></p>
+      <div id="history-list"></div>
     </div>
 
     <div class="panel">
@@ -326,6 +430,12 @@
     </div>
 
     <div class="panel">
+      <h2>🎁 RÉCOMPENSES</h2>
+      <p class="sub">Débloquées en atteignant les paliers de poids.</p>
+      <div id="rewards-list"></div>
+    </div>
+
+    <div class="panel">
       <h2>🥇 SUCCÈS</h2>
       <div id="ach-list"></div>
     </div>
@@ -352,6 +462,14 @@
 </nav>
 
 <div class="toast" id="toast"></div>
+
+<div id="levelup-overlay">
+  <div class="levelup-swords">⚔️⚔️⚔️⚔️⚔️</div>
+  <div class="levelup-title" id="levelup-title">NIVEAU SUPÉRIEUR !</div>
+  <div class="levelup-sub" id="levelup-sub"></div>
+  <div class="levelup-swords">⚔️⚔️⚔️⚔️⚔️</div>
+  <div class="levelup-tap">(touche l'écran pour continuer)</div>
+</div>
 
 <script>
 (function(){
@@ -383,19 +501,19 @@
   // Chaque lundi aura toujours les mêmes quêtes, chaque mardi les mêmes, etc.
   const WEEKDAY_THEMES = {
     1: {icon:"⚔️", title:"Jour du Guerrier", quests:[
-      {id:"pas8000", label:"8 000 pas", xp:30},
+      {id:"pas8000", label:"8 000 pas", xp:30, type:"steps", amount:8000},
       {id:"nosoda", label:"Aucun soda", xp:15},
-      {id:"seance", label:"Séance complète", xp:50}
+      {id:"seance", label:"Séance complète", xp:50, type:"seance"}
     ]},
     2: {icon:"🏃", title:"Jour de l'Éclaireur", quests:[
-      {id:"pas10000", label:"10 000 pas", xp:35},
+      {id:"pas10000", label:"10 000 pas", xp:35, type:"steps", amount:10000},
       {id:"eau2l", label:"2 litres d'eau", xp:20},
       {id:"nogrignotage", label:"Aucun grignotage", xp:15}
     ]},
     3: {icon:"💪", title:"Jour de Sport", quests:[
-      {id:"pas8000b", label:"8 000 pas", xp:30},
+      {id:"pas8000b", label:"8 000 pas", xp:30, type:"steps", amount:8000},
       {id:"nosodab", label:"Aucun soda", xp:15},
-      {id:"seanceb", label:"Séance complète", xp:50}
+      {id:"seanceb", label:"Séance complète", xp:50, type:"seance"}
     ]},
     4: {icon:"🍳", title:"Jour du Chef", quests:[
       {id:"cuisiner", label:"Cuisiner tous ses repas", xp:20},
@@ -403,16 +521,16 @@
       {id:"nogrignotageb", label:"Aucun grignotage", xp:15}
     ]},
     5: {icon:"⚔️", title:"Jour du Guerrier", quests:[
-      {id:"pas8000c", label:"8 000 pas", xp:30},
+      {id:"pas8000c", label:"8 000 pas", xp:30, type:"steps", amount:8000},
       {id:"nosodac", label:"Aucun soda", xp:15},
-      {id:"seancec", label:"Séance complète", xp:50}
+      {id:"seancec", label:"Séance complète", xp:50, type:"seance"}
     ]},
     6: {icon:"👹", title:"Jour du Boss (samedi)", quests:[
-      {id:"pas8000d", label:"8 000 pas", xp:30},
+      {id:"pas8000d", label:"8 000 pas", xp:30, type:"steps", amount:8000},
       {id:"eau2lc", label:"2 litres d'eau", xp:20}
     ]},
     0: {icon:"😴", title:"Jour du Sage", quests:[
-      {id:"pas7000", label:"7 000 pas", xp:25},
+      {id:"pas7000", label:"7 000 pas", xp:25, type:"steps", amount:7000},
       {id:"nogrignotagec", label:"Aucun grignotage", xp:15},
       {id:"reposactif", label:"Repos actif (étirements, marche tranquille)", xp:15}
     ]}
@@ -431,11 +549,16 @@
   ];
 
   const ACHIEVEMENTS = [
-    {id:"streak7", medal:"🥇", label:"7 jours d'affilée", xp:150, auto:true},
-    {id:"kilo1", medal:"🥈", label:"Premier kilo perdu", xp:250, auto:false},
+    {id:"kilo1", medal:"🥈", label:"Premier sang — Premier kilo perdu", xp:250, auto:false},
+    {id:"streak7", medal:"🔥", label:"Incassable — 7 jours d'affilée", xp:150, auto:true},
     {id:"month1", medal:"🥉", label:"Premier mois terminé", xp:500, auto:false},
-    {id:"pants", medal:"🏅", label:"Premier pantalon devenu trop grand", xp:500, auto:false},
-    {id:"streak30", medal:"🔥", label:"30 jours sans abandon", xp:1000, auto:true}
+    {id:"pants", medal:"👖", label:"Premier pantalon devenu trop grand", xp:500, auto:false},
+    {id:"streak30", medal:"🔥", label:"30 jours sans abandon", xp:1000, auto:true},
+    {id:"walker", medal:"👟", label:"Marcheur — 100 000 pas cumulés", xp:500, auto:true},
+    {id:"warrior10", medal:"💪", label:"Guerrier — 10 séances réalisées", xp:500, auto:true},
+    {id:"balance", medal:"🍕", label:"Maître de l'équilibre — Profiter d'un repas plaisir sans culpabiliser", xp:300, auto:true},
+    {id:"bossfinal", medal:"💀", label:"Le Boss final — Atteindre 88 kg", xp:2000, auto:true},
+    {id:"papaenforme", medal:"👨‍👧", label:"Papa en forme — Objectif final atteint", xp:5000, auto:true}
   ];
 
   const CHALLENGES = [
@@ -475,17 +598,28 @@
       weight: 96,
       xpTotal: 0,
       currentDate: todayKey(),
-      dailyChecks: {},
+      dailyChecksByDate: {},
       streak: 0,
+      bestStreak: 0,
+      stepsTotal: 0,
+      seanceCount: 0,
       classes: {},
       achievements: {},
       bossWeekKey: null,
       weeklyChallenge: {weekKey:null, text:null, completed:false},
-      finalQuest: {}
+      finalQuest: {},
+      weightHistory: [],
+      rewardsClaimed: {},
+      dailyEvent: null
     };
   }
 
   let state = defaultState();
+
+  function getTodayChecks(){
+    if(!state.dailyChecksByDate[state.currentDate]){ state.dailyChecksByDate[state.currentDate] = {}; }
+    return state.dailyChecksByDate[state.currentDate];
+  }
 
   async function saveState(){
     clearTimeout(saveTimer);
@@ -499,25 +633,107 @@
   async function loadState(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(raw){ state = Object.assign(defaultState(), JSON.parse(raw)); }
+      if(raw){
+        const parsed = JSON.parse(raw);
+        state = Object.assign(defaultState(), parsed);
+        // migration : ancien format "dailyChecks" (un seul jour) -> dailyChecksByDate
+        if(parsed.dailyChecks && !state.dailyChecksByDate[parsed.currentDate]){
+          state.dailyChecksByDate[parsed.currentDate] = parsed.dailyChecks;
+        }
+        delete state.dailyChecks;
+      }
     }catch(e){ /* no saved state yet */ }
+    if(!state.weightHistory || state.weightHistory.length === 0){
+      state.weightHistory = [{date: state.currentDate, weight: state.weight}];
+    }
     rolloverDayIfNeeded();
   }
 
   function rolloverDayIfNeeded(){
     const tk = todayKey();
     if(state.currentDate !== tk){
-      const prevDate = new Date(state.currentDate + "T12:00:00");
-      const prevQuests = getActiveDailyQuests(prevDate);
-      const wasFull = prevQuests.every(q => state.dailyChecks[q.id]);
-      if(wasFull){ state.streak = (state.streak||0) + 1; }
-      else { state.streak = 0; }
-      state.dailyChecks = {};
       state.currentDate = tk;
     }
+    computeStreakAndBest();
+    rollDailyEvent();
   }
 
-  // ---------- toast ----------
+  // Tire (une fois par jour) un événement aléatoire : marchand ambulant, invasion
+  // de boss, ou événement du sage si toutes les quêtes d'hier ont été complétées.
+  function rollDailyEvent(){
+    if(state.dailyEvent && state.dailyEvent.date === state.currentDate) return;
+
+    const yesterday = new Date(state.currentDate + "T12:00:00");
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yKey = todayKey(yesterday);
+    const yChecks = state.dailyChecksByDate[yKey] || {};
+    const yQuests = getActiveDailyQuests(yesterday);
+    const yesterdayFull = yQuests.length > 0 && yQuests.every(q => yChecks[q.id]);
+
+    let type = null;
+    if(yesterdayFull){
+      type = "sage";
+    } else {
+      const roll = Math.random();
+      if(roll < 0.18) type = "marchand";
+      else if(roll < 0.32) type = "boss";
+    }
+    state.dailyEvent = {date: state.currentDate, type, claimed:false, bonusApplied:false, bonusQuestId:null, bonusAmount:0};
+  }
+
+  // Recalcule la série en cours et la meilleure série à partir de l'historique complet
+  // des jours (et non d'un simple compteur incrémental), pour gérer correctement
+  // les jours sautés (ex: si l'appli n'est pas ouverte pendant 2 jours).
+  function computeStreakAndBest(){
+    const fullDays = new Set();
+    Object.keys(state.dailyChecksByDate).forEach(d=>{
+      if(d === state.currentDate) return; // le jour en cours ne compte pas encore
+      const dateObj = new Date(d + "T12:00:00");
+      const quests = getActiveDailyQuests(dateObj);
+      const checks = state.dailyChecksByDate[d] || {};
+      const wasFull = quests.length > 0 && quests.every(q => checks[q.id]);
+      if(wasFull) fullDays.add(d);
+    });
+
+    // série en cours : on remonte jour par jour depuis hier tant que c'est complet
+    let streak = 0;
+    const cursor = new Date(state.currentDate + "T12:00:00");
+    cursor.setDate(cursor.getDate() - 1);
+    while(fullDays.has(todayKey(cursor))){
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    state.streak = streak;
+
+    // meilleure série historique : plus longue suite de jours consécutifs complets
+    const sorted = Array.from(fullDays).sort();
+    let best = 0, run = 0, prevDate = null;
+    sorted.forEach(d=>{
+      if(prevDate){
+        const diffDays = Math.round((new Date(d+"T12:00:00") - new Date(prevDate+"T12:00:00")) / 86400000);
+        run = diffDays === 1 ? run + 1 : 1;
+      } else {
+        run = 1;
+      }
+      best = Math.max(best, run);
+      prevDate = d;
+    });
+    state.bestStreak = Math.max(state.bestStreak || 0, best, streak);
+  }
+
+  // ---------- level up overlay ----------
+  let levelupTimer = null;
+  function showLevelUp(lines){
+    const ov = document.getElementById("levelup-overlay");
+    document.getElementById("levelup-sub").innerHTML = lines.join("<br>");
+    ov.classList.add("show");
+    clearTimeout(levelupTimer);
+    levelupTimer = setTimeout(()=> ov.classList.remove("show"), 2600);
+  }
+  document.getElementById("levelup-overlay").addEventListener("click", ()=>{
+    document.getElementById("levelup-overlay").classList.remove("show");
+    clearTimeout(levelupTimer);
+  });
   let toastTimer = null;
   function showToast(msg){
     const t = document.getElementById("toast");
@@ -528,52 +744,77 @@
   }
 
   function addXP(amount){
+    const prevXPLevel = getXPLevel(state.xpTotal);
     state.xpTotal = Math.max(0, state.xpTotal + amount);
+    const newXPLevel = getXPLevel(state.xpTotal);
     checkAutoAchievements();
     saveState();
+    if(amount > 0 && newXPLevel.level > prevXPLevel.level){
+      showLevelUp(["NIVEAU " + newXPLevel.level, newXPLevel.title.toUpperCase()]);
+    }
   }
 
   function checkAutoAchievements(){
     ACHIEVEMENTS.forEach(a=>{
       if(!a.auto || state.achievements[a.id]) return;
-      if(a.id === "streak7" && state.streak >= 7){ claimAchievement(a, true); }
-      if(a.id === "streak30" && state.streak >= 30){ claimAchievement(a, true); }
+      if(a.id === "streak7" && state.streak >= 7) claimAchievement(a);
+      if(a.id === "streak30" && state.streak >= 30) claimAchievement(a);
+      if(a.id === "walker" && state.stepsTotal >= 100000) claimAchievement(a);
+      if(a.id === "warrior10" && state.seanceCount >= 10) claimAchievement(a);
+      if(a.id === "bossfinal" && state.weight <= 88) claimAchievement(a);
     });
   }
 
-  function claimAchievement(a, silentXP){
+  function claimAchievement(a){
     if(state.achievements[a.id]) return;
     state.achievements[a.id] = true;
-    if(!silentXP){ state.xpTotal += a.xp; }
-    else { state.xpTotal += a.xp; }
+    state.xpTotal += a.xp;
     showToast("🏅 SUCCÈS : " + a.label + " (+" + a.xp + " XP)");
     saveState();
     renderAll();
   }
 
   function getLevelInfo(weight){
-    for(let i=0;i<LEVELS.length;i++){
-      if(weight <= LEVELS[i].kg) continue;
-    }
-    let current = LEVELS[0];
-    for(const lv of LEVELS){
-      if(weight <= lv.kg){ current = lv; }
-    }
-    // find highest level reached (weight <= kg), lowest kg reached wins (closest to MAX)
     let reached = LEVELS[0];
-    for(const lv of LEVELS){ if(weight <= lv.kg) reached = lv; }
+    for(const lv of LEVELS){ if(weight <= lv.kg){ reached = lv; } }
     return reached;
+  }
+
+  // ---------- système XP à paliers (niveaux RPG) ----------
+  const XP_LEVELS = [
+    {level:1, title:"Recrue", required:0},
+    {level:2, title:"Aventurier", required:100},
+    {level:3, title:"Guerrier", required:250},
+    {level:4, title:"Champion", required:450},
+    {level:5, title:"Héros", required:700},
+    {level:6, title:"Légende", required:1000},
+    {level:7, title:"Mythique", required:1500}
+  ];
+  function getXPLevel(xp){
+    let current = XP_LEVELS[0];
+    for(const l of XP_LEVELS){ if(xp >= l.required){ current = l; } }
+    return current;
+  }
+  function getXPProgress(xp){
+    const cur = getXPLevel(xp);
+    const idx = XP_LEVELS.indexOf(cur);
+    const next = XP_LEVELS[idx+1];
+    if(!next){ return {cur, next:null, pct:100, into: xp - cur.required, span:0}; }
+    const span = next.required - cur.required;
+    const into = xp - cur.required;
+    return {cur, next, pct: Math.max(0, Math.min(100, Math.round(into/span*100))), into, span};
   }
 
   // ---------- rendering ----------
   function renderHUD(){
-    const lvl = getLevelInfo(state.weight);
-    document.getElementById("hud-level").textContent = lvl.n;
+    const weightLvl = getLevelInfo(state.weight);
+    const prog = getXPProgress(state.xpTotal);
+    document.getElementById("hud-level").textContent = prog.cur.level;
     document.getElementById("hud-weight").textContent = state.weight + " kg";
     document.getElementById("hud-xp").textContent = state.xpTotal;
-    const mod = state.xpTotal % 100;
-    document.getElementById("xpbar-inner").style.width = mod + "%";
-    document.getElementById("xplabel").textContent = mod + " / 100 vers le prochain palier";
+    document.getElementById("xpbar-inner").style.width = prog.pct + "%";
+    document.getElementById("xplabel").textContent = prog.cur.title.toUpperCase() +
+      (prog.next ? " — " + prog.into + " / " + prog.span + " XP vers " + prog.next.title : " — NIVEAU MAX");
     document.getElementById("input-weight").value = state.weight;
   }
 
@@ -605,15 +846,43 @@
   function renderQuestGroup(containerId, list){
     const el = document.getElementById(containerId);
     el.innerHTML = "";
+    const todayChecks = getTodayChecks();
     list.forEach(q=>{
-      const checked = !!state.dailyChecks[q.id];
+      const checked = !!todayChecks[q.id];
       const row = document.createElement("div");
       row.className = "quest" + (checked ? " checked" : "");
       row.innerHTML = `<div class="checkbox">${checked ? "✔" : ""}</div><div class="label">${q.label}</div><div class="xp-pill">+${q.xp} XP</div>`;
       row.addEventListener("click", ()=>{
-        const isChecked = !!state.dailyChecks[q.id];
-        if(isChecked){ delete state.dailyChecks[q.id]; addXP(-q.xp); }
-        else { state.dailyChecks[q.id] = true; addXP(q.xp); }
+        const checks = getTodayChecks();
+        const isChecked = !!checks[q.id];
+        const delta = q.type === "steps" ? q.amount : 0;
+        if(isChecked){
+          delete checks[q.id];
+          addXP(-q.xp);
+          if(q.type === "steps"){ state.stepsTotal = Math.max(0, state.stepsTotal - delta); }
+          if(q.type === "seance"){ state.seanceCount = Math.max(0, state.seanceCount - 1); }
+          if(state.dailyEvent && state.dailyEvent.bonusQuestId === q.id){
+            addXP(-state.dailyEvent.bonusAmount);
+            state.dailyEvent.bonusApplied = false;
+            state.dailyEvent.bonusQuestId = null;
+            state.dailyEvent.bonusAmount = 0;
+          }
+        } else {
+          checks[q.id] = true;
+          addXP(q.xp);
+          if(q.type === "steps"){ state.stepsTotal += delta; }
+          if(q.type === "seance"){ state.seanceCount += 1; }
+          if(state.dailyEvent && state.dailyEvent.type === "sage" && !state.dailyEvent.bonusApplied){
+            const bonus = Math.round(q.xp * 0.5);
+            addXP(bonus);
+            state.dailyEvent.bonusApplied = true;
+            state.dailyEvent.bonusQuestId = q.id;
+            state.dailyEvent.bonusAmount = bonus;
+            showToast("🧙 Bonus du Sage : +" + bonus + " XP !");
+          }
+        }
+        checkAutoAchievements();
+        saveState();
         renderAll();
       });
       el.appendChild(row);
@@ -632,9 +901,15 @@
 
     const wk = isoWeekKey();
     const bossDone = state.bossWeekKey === wk;
+    const isSaturday = new Date().getDay() === 6;
     const bossBtn = document.getElementById("btn-boss-week");
-    bossBtn.textContent = bossDone ? "✔️ Déjà validé cette semaine" : "⚔️ Victoire (+100 XP)";
-    bossBtn.classList.toggle("disabled", bossDone);
+    if(!isSaturday){
+      bossBtn.textContent = "👹 Le Boss apparaîtra samedi";
+      bossBtn.classList.add("disabled");
+    } else {
+      bossBtn.textContent = bossDone ? "✔️ Déjà validé cette semaine" : "⚔️ Victoire (+100 XP)";
+      bossBtn.classList.toggle("disabled", bossDone);
+    }
 
     const ch = state.weeklyChallenge;
     const drawBtn = document.getElementById("btn-draw-challenge");
@@ -649,9 +924,95 @@
       drawBtn.style.display = "inline-block";
       doneBtn.style.display = "none";
     }
+
+    renderEvent();
+  }
+
+  function renderEvent(){
+    const panel = document.getElementById("event-panel");
+    const box = document.getElementById("eventbox");
+    const ev = state.dailyEvent;
+
+    if(!ev || !ev.type){
+      panel.style.display = "none";
+      return;
+    }
+    panel.style.display = "block";
+
+    if(ev.type === "marchand"){
+      box.innerHTML = `
+        <h4>🛒 LE MARCHAND AMBULANT</h4>
+        <p>Il est passé par là et te laisse une petite récompense pour ta régularité.</p>
+        <div class="btn-row" style="justify-content:center;">
+          <div class="btn green small" id="btn-event-claim">${ev.claimed ? "✅ Récupéré" : "🎁 Récupérer (+20 XP)"}</div>
+        </div>`;
+      const btn = document.getElementById("btn-event-claim");
+      if(ev.claimed){ btn.classList.add("disabled"); }
+      btn.addEventListener("click", ()=>{
+        if(state.dailyEvent.claimed) return;
+        state.dailyEvent.claimed = true;
+        addXP(20);
+        showToast("🛒 Cadeau du marchand : +20 XP");
+        renderAll();
+      });
+    } else if(ev.type === "boss"){
+      box.innerHTML = `
+        <h4>👹 INVASION DU BOSS</h4>
+        <p>Une quête bonus apparaît aujourd'hui : 12 000 pas supplémentaires.</p>
+        <div class="quest ${ev.claimed ? "checked" : ""}" id="event-boss-quest">
+          <div class="checkbox">${ev.claimed ? "✔" : ""}</div>
+          <div class="label">12 000 pas supplémentaires</div>
+          <div class="xp-pill">+75 XP</div>
+        </div>`;
+      document.getElementById("event-boss-quest").addEventListener("click", ()=>{
+        if(state.dailyEvent.claimed){
+          state.dailyEvent.claimed = false;
+          addXP(-75);
+        } else {
+          state.dailyEvent.claimed = true;
+          addXP(75);
+        }
+        saveState();
+        renderAll();
+      });
+    } else if(ev.type === "sage"){
+      box.innerHTML = `
+        <h4>🧙 ÉVÉNEMENT DU SAGE</h4>
+        <p>Tu as terminé toutes tes quêtes hier ! ${ev.bonusApplied ? ("Bonus déjà appliqué : +" + ev.bonusAmount + " XP.") : "Ta première quête cochée aujourd'hui rapporte +50% XP."}</p>`;
+    }
+  }
+
+  function renderRewards(){
+    const list = document.getElementById("rewards-list");
+    list.innerHTML = "";
+    LEVELS.forEach((lv, idx)=>{
+      const reached = state.weight <= lv.kg;
+      const claimed = !!state.rewardsClaimed[idx];
+      const row = document.createElement("div");
+      row.className = "reward-row" + (!reached ? " locked" : (claimed ? " claimed" : ""));
+      const icon = !reached ? "🔒" : (claimed ? "✅" : "🎁");
+      const btnHtml = !reached
+        ? `<span class="xp-pill">VERROUILLÉ</span>`
+        : (claimed
+          ? `<span class="xp-pill">OBTENUE</span>`
+          : `<div class="btn small green" data-reward="${idx}">Marquer comme obtenue</div>`);
+      row.innerHTML = `<div class="ricon">${icon}</div><div class="rinfo"><b>Niveau ${lv.n} — ${lv.kg} kg</b><span>${lv.reward}</span></div>${btnHtml}`;
+      list.appendChild(row);
+    });
+    list.querySelectorAll("[data-reward]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const idx = btn.dataset.reward;
+        if(state.rewardsClaimed[idx]) return;
+        state.rewardsClaimed[idx] = true;
+        showToast("🎁 Récompense marquée comme obtenue !");
+        saveState();
+        renderGuilde();
+      });
+    });
   }
 
   function renderGuilde(){
+    renderRewards();
     const grid = document.getElementById("classgrid");
     grid.innerHTML = "";
     CLASSES.forEach(c=>{
@@ -693,9 +1054,7 @@
     list.innerHTML = "";
     let doneCount = 0;
     FINAL_QUEST.forEach(f=>{
-      let checked;
-      if(f.auto){ checked = state.weight <= 88; state.finalQuest[f.id] = checked; }
-      else { checked = !!state.finalQuest[f.id]; }
+      const checked = f.auto ? (state.weight <= 88) : !!state.finalQuest[f.id];
       if(checked) doneCount++;
       const row = document.createElement("div");
       row.className = "quest" + (checked ? " checked" : "");
@@ -711,12 +1070,153 @@
     });
     const pct = Math.round((doneCount / FINAL_QUEST.length) * 100);
     document.getElementById("final-progress").style.width = pct + "%";
+    if(doneCount === FINAL_QUEST.length){
+      const a = ACHIEVEMENTS.find(x=>x.id==="papaenforme");
+      if(a && !state.achievements[a.id]){ claimAchievement(a); }
+    }
+  }
+
+  const START_WEIGHT = 96;
+  const GOAL_WEIGHT = 88;
+
+  function renderDashboard(){
+    const prog = getXPProgress(state.xpTotal);
+    document.getElementById("dash-lvltitle").textContent = "N" + prog.cur.level + " — " + prog.cur.title;
+    document.getElementById("dash-lost").textContent = Math.max(0, +(START_WEIGHT - state.weight).toFixed(1)) + " kg";
+    document.getElementById("dash-streak").textContent = state.streak || 0;
+    const totalAch = ACHIEVEMENTS.length;
+    const doneAch = Object.values(state.achievements).filter(Boolean).length;
+    document.getElementById("dash-achcount").textContent = doneAch + "/" + totalAch;
+
+    const weightPct = Math.max(0, Math.min(100, Math.round((START_WEIGHT - state.weight) / (START_WEIGHT - GOAL_WEIGHT) * 100)));
+    document.getElementById("dash-weightbar").style.width = weightPct + "%";
+
+    const now = new Date();
+    const todayQuests = getActiveDailyQuests(now);
+    const todayChecks = getTodayChecks();
+    const doneToday = todayQuests.filter(q => todayChecks[q.id]).length;
+    const xpToday = todayQuests.filter(q => todayChecks[q.id]).reduce((s,q)=>s+q.xp,0);
+    document.getElementById("dash-todaycount").textContent = doneToday + "/" + todayQuests.length;
+    document.getElementById("dash-todayxp").textContent = "+" + xpToday + " XP";
+    document.getElementById("dash-todaybar").style.width = Math.round(doneToday/todayQuests.length*100) + "%";
+
+    const nextLevel = LEVELS.find(lv => state.weight > lv.kg);
+    const nextText = document.getElementById("dash-nexttext");
+    if(nextLevel){
+      const remaining = +(state.weight - nextLevel.kg).toFixed(1);
+      nextText.innerHTML = "⬇️ Atteindre " + nextLevel.kg + " kg<br>Encore " + remaining + " kg<br>Récompense : " + nextLevel.reward;
+    } else {
+      nextText.innerHTML = "🏆 Tu as atteint l'objectif final : 88 kg !";
+    }
+  }
+
+  function renderWeightHistory(){
+    const hist = (state.weightHistory || []).slice().sort((a,b)=> a.date.localeCompare(b.date));
+    const points = hist.length ? hist : [{date: state.currentDate, weight: state.weight}];
+    const startW = points[0].weight;
+    const bestW = Math.min(...points.map(p=>p.weight), state.weight);
+
+    document.getElementById("wh-start").textContent = startW + " kg";
+    document.getElementById("wh-lost").textContent = Math.max(0, +(startW - state.weight).toFixed(1)) + " kg";
+    document.getElementById("wh-best").textContent = bestW + " kg";
+    document.getElementById("wh-remaining").textContent = Math.max(0, +(state.weight - GOAL_WEIGHT).toFixed(1)) + " kg";
+
+    // ---- graphique SVG pixel-art ----
+    const svg = document.getElementById("weight-chart");
+    const ns = "http://www.w3.org/2000/svg";
+    svg.innerHTML = "";
+    const w = 300, h = 120, pad = 12;
+    const weights = points.map(p=>p.weight);
+    const maxW = Math.max(...weights, startW);
+    const minW = Math.min(...weights, GOAL_WEIGHT);
+    const span = (maxW - minW) || 1;
+    const scaleY = v => h - pad - ((v - minW) / span) * (h - 2*pad);
+    const xStep = points.length > 1 ? (w - 2*pad) / (points.length - 1) : 0;
+
+    const goalY = scaleY(GOAL_WEIGHT);
+    const goalLine = document.createElementNS(ns, "line");
+    goalLine.setAttribute("x1", pad); goalLine.setAttribute("x2", w - pad);
+    goalLine.setAttribute("y1", goalY); goalLine.setAttribute("y2", goalY);
+    goalLine.setAttribute("stroke", "#4a7c3f"); goalLine.setAttribute("stroke-width", "2");
+    goalLine.setAttribute("stroke-dasharray", "5,4");
+    svg.appendChild(goalLine);
+
+    let d = "";
+    points.forEach((p,i)=>{
+      const x = pad + i*xStep;
+      const y = scaleY(p.weight);
+      d += (i===0 ? "M" : "L") + x + "," + y + " ";
+    });
+    const path = document.createElementNS(ns, "path");
+    path.setAttribute("d", d.trim());
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "#f1c948");
+    path.setAttribute("stroke-width", "3");
+    svg.appendChild(path);
+
+    points.forEach((p,i)=>{
+      const x = pad + i*xStep;
+      const y = scaleY(p.weight);
+      const dot = document.createElementNS(ns, "rect");
+      dot.setAttribute("x", x-3); dot.setAttribute("y", y-3);
+      dot.setAttribute("width", 6); dot.setAttribute("height", 6);
+      dot.setAttribute("fill", "#f1c948");
+      svg.appendChild(dot);
+    });
+
+    // ---- liste des dernières pesées ----
+    const listEl = document.getElementById("weight-history-list");
+    listEl.innerHTML = "";
+    const recent = points.slice().reverse().slice(0, 8);
+    if(recent.length <= 1){
+      listEl.innerHTML = '<p class="empty-note">Pèse-toi régulièrement pour voir ton évolution ici 📉</p>';
+    } else {
+      recent.forEach(p=>{
+        const dObj = new Date(p.date + "T12:00:00");
+        const row = document.createElement("div");
+        row.className = "histrow";
+        row.innerHTML = `<div class="hemoji">⚖️</div><div class="hday">${dObj.toLocaleDateString("fr-FR",{day:"numeric", month:"short", year:"numeric"})}</div><div class="hpct">${p.weight} kg</div>`;
+        listEl.appendChild(row);
+      });
+    }
+  }
+
+  function renderHistory(){
+    document.getElementById("streak-count").textContent = state.streak || 0;
+    document.getElementById("best-streak").textContent = state.bestStreak || 0;
+
+    const dates = Object.keys(state.dailyChecksByDate).filter(d => d !== state.currentDate).sort().reverse();
+    const list = document.getElementById("history-list");
+    list.innerHTML = "";
+    if(dates.length === 0){
+      list.innerHTML = '<p class="empty-note">Reviens demain pour voir ton premier jour ici 👋</p>';
+      document.getElementById("success-rate").textContent = "—";
+      return;
+    }
+    let sumPct = 0;
+    dates.slice(0, 10).forEach(d=>{
+      const dateObj = new Date(d + "T12:00:00");
+      const quests = getActiveDailyQuests(dateObj);
+      const checks = state.dailyChecksByDate[d] || {};
+      const done = quests.filter(q => checks[q.id]).length;
+      const pct = quests.length ? Math.round(done/quests.length*100) : 0;
+      sumPct += pct;
+      const emoji = pct >= 100 ? "🟢" : (pct >= 50 ? "🟡" : "🔴");
+      const row = document.createElement("div");
+      row.className = "histrow";
+      row.innerHTML = `<div class="hemoji">${emoji}</div><div class="hday">${dateObj.toLocaleDateString("fr-FR",{weekday:"long", day:"numeric", month:"short"})}</div><div class="hpct">${done}/${quests.length}</div>`;
+      list.appendChild(row);
+    });
+    document.getElementById("success-rate").textContent = Math.round(sumPct / Math.min(dates.length,10)) + "%";
   }
 
   function renderAll(){
     renderHUD();
+    renderDashboard();
+    renderWeightHistory();
     renderLevelPath();
     renderQuetes();
+    renderHistory();
     renderGuilde();
     renderFinal();
   }
@@ -728,16 +1228,21 @@
     const prevLevel = getLevelInfo(state.weight);
     state.weight = val;
     const newLevel = getLevelInfo(state.weight);
+    const todayEntry = state.weightHistory.find(h => h.date === state.currentDate);
+    if(todayEntry){ todayEntry.weight = val; }
+    else { state.weightHistory.push({date: state.currentDate, weight: val}); }
+    checkAutoAchievements();
     saveState();
     renderAll();
     if(newLevel.kg !== prevLevel.kg && state.weight <= newLevel.kg){
-      showToast("🎉 NIVEAU " + newLevel.n + " ATTEINT !");
+      showLevelUp(["NIVEAU " + newLevel.n + " ATTEINT !", newLevel.kg + " KG", newLevel.reward]);
     } else {
       showToast("Poids mis à jour : " + state.weight + " kg");
     }
   });
 
   document.getElementById("btn-boss-week").addEventListener("click", ()=>{
+    if(new Date().getDay() !== 6) return;
     const wk = isoWeekKey();
     if(state.bossWeekKey === wk) return;
     state.bossWeekKey = wk;
@@ -748,6 +1253,8 @@
 
   document.getElementById("btn-boss-anniv").addEventListener("click", ()=>{
     showToast("🎂 Aucune culpabilité. On reprend demain !");
+    const a = ACHIEVEMENTS.find(x=>x.id==="balance");
+    if(a && !state.achievements[a.id]){ claimAchievement(a); }
   });
 
   document.getElementById("btn-draw-challenge").addEventListener("click", ()=>{
@@ -767,15 +1274,62 @@
     renderQuetes();
   });
 
+  const TAB_ORDER = ["accueil", "quetes", "guilde", "final"];
+
+  function activateScreen(name, direction){
+    const current = document.querySelector(".screen.active");
+    const currentName = current ? current.id.replace("screen-", "") : null;
+    if(currentName === name) return;
+
+    document.querySelectorAll("#tabbar button").forEach(b=>{
+      b.classList.toggle("active", b.dataset.screen === name);
+    });
+    document.querySelectorAll(".screen").forEach(s=>{
+      s.classList.remove("active", "slide-left", "slide-right");
+    });
+    const next = document.getElementById("screen-" + name);
+    next.classList.add("active", direction === "left" ? "slide-left" : "slide-right");
+    window.scrollTo(0,0);
+  }
+
   document.querySelectorAll("#tabbar button").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      document.querySelectorAll("#tabbar button").forEach(b=>b.classList.remove("active"));
-      document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-      btn.classList.add("active");
-      document.getElementById("screen-" + btn.dataset.screen).classList.add("active");
-      window.scrollTo(0,0);
+      const fromIdx = TAB_ORDER.indexOf(document.querySelector(".screen.active").id.replace("screen-",""));
+      const toIdx = TAB_ORDER.indexOf(btn.dataset.screen);
+      activateScreen(btn.dataset.screen, toIdx >= fromIdx ? "right" : "left");
     });
   });
+
+  // ---------- swipe entre onglets ----------
+  (function setupSwipe(){
+    const main = document.querySelector("main");
+    let startX = 0, startY = 0, startTime = 0, tracking = false;
+
+    main.addEventListener("touchstart", (e)=>{
+      const t = e.changedTouches[0];
+      startX = t.clientX; startY = t.clientY; startTime = Date.now();
+      tracking = true;
+    }, {passive:true});
+
+    main.addEventListener("touchend", (e)=>{
+      if(!tracking) return;
+      tracking = false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      const dt = Date.now() - startTime;
+      const isHorizontalSwipe = Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4 && dt < 700;
+      if(!isHorizontalSwipe) return;
+
+      const currentName = document.querySelector(".screen.active").id.replace("screen-", "");
+      const idx = TAB_ORDER.indexOf(currentName);
+      if(dx < 0 && idx < TAB_ORDER.length - 1){
+        activateScreen(TAB_ORDER[idx + 1], "left");
+      } else if(dx > 0 && idx > 0){
+        activateScreen(TAB_ORDER[idx - 1], "right");
+      }
+    }, {passive:true});
+  })();
 
   // ---------- init ----------
   loadState().then(()=>{
