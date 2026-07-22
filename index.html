@@ -24,8 +24,10 @@
     --lock:#8a8070;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0;min-height:100%;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;}
   body{
+    display:flex;
+    flex-direction:column;
     background:var(--wood-dark);
     background-image:
       repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 2px, transparent 2px, transparent 4px),
@@ -34,17 +36,17 @@
     font-family:'VT323', monospace;
     font-size:22px;
     line-height:1.25;
-    min-height:100vh;
-    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+    height:100vh;
+    height:100dvh;
     -webkit-user-select:none; user-select:none;
-    -webkit-overflow-scrolling:touch;
     overscroll-behavior-y:contain;
   }
   .pixel-font{ font-family:'Press Start 2P', monospace; }
 
   /* ---------- top bar ---------- */
   #topbar{
-    position:sticky; top:0; z-index:20;
+    flex-shrink:0;
+    position:relative; z-index:20;
     background:var(--wood);
     border-bottom:4px solid var(--wood-dark);
     box-shadow:0 4px 0 rgba(0,0,0,0.4);
@@ -79,7 +81,16 @@
   #xplabel{ font-size:13px; text-align:center; color:var(--parchment-dark); margin-top:2px;}
 
   /* ---------- layout ---------- */
-  main{ padding:14px 12px 20px; max-width:520px; margin:0 auto; overflow-x:hidden; touch-action:pan-y; }
+  main{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    padding:14px 12px 24px;
+    max-width:520px; width:100%; margin:0 auto;
+  }
   .screen{ display:none; }
   .screen.active{ display:block; }
   .screen.active.slide-right{ animation:slideInRight .28s ease-out; }
@@ -218,7 +229,7 @@
 
   /* bottom tab bar */
   nav#tabbar{
-    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    flex-shrink:0; z-index:30;
     background:var(--wood); border-top:4px solid var(--wood-dark);
     display:flex; padding:6px 4px calc(6px + env(safe-area-inset-bottom)) 4px;
   }
@@ -1289,7 +1300,7 @@
     });
     const next = document.getElementById("screen-" + name);
     next.classList.add("active", direction === "left" ? "slide-left" : "slide-right");
-    window.scrollTo(0,0);
+    document.querySelector("main").scrollTo(0,0);
   }
 
   document.querySelectorAll("#tabbar button").forEach(btn=>{
