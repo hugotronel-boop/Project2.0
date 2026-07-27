@@ -1,0 +1,2747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Project Hugo">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a120b">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231a120b'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle'%3E%E2%9A%94%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<title>⚔️ OPÉRATION : PROJECT HUGO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wood-dark:#1a120b;
+    --wood:#3a2a1a;
+    --wood-light:#6b4423;
+    --parchment:#ecdfc0;
+    --parchment-dark:#d9c69a;
+    --ink:#2b1d0e;
+    --gold:#d4a017;
+    --gold-bright:#f1c948;
+    --green:#4a7c3f;
+    --green-bright:#6fae5c;
+    --red:#a13d2b;
+    --red-bright:#c9553d;
+    --teal:#3d6b6b;
+    --lock:#8a8070;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;}
+  body{
+    display:flex;
+    flex-direction:column;
+    background:var(--wood-dark);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 2px, transparent 2px, transparent 4px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px);
+    color:var(--ink);
+    font-family:'VT323', monospace;
+    font-size:22px;
+    line-height:1.25;
+    height:100vh;
+    height:100dvh;
+    -webkit-user-select:none; user-select:none;
+    overscroll-behavior-y:contain;
+  }
+  .pixel-font{ font-family:'Press Start 2P', monospace; }
+
+  /* ---------- top bar ---------- */
+  #topbar{
+    flex-shrink:0;
+    position:relative; z-index:20;
+    background:var(--wood);
+    border-bottom:4px solid var(--wood-dark);
+    box-shadow:0 4px 0 rgba(0,0,0,0.4);
+    padding:10px 12px calc(10px + env(safe-area-inset-top)/3) 12px;
+    padding-top: max(10px, env(safe-area-inset-top));
+    color:var(--gold-bright);
+  }
+  #topbar .title{
+    font-family:'Press Start 2P', monospace;
+    font-size:11px;
+    color:var(--gold-bright);
+    text-shadow:2px 2px 0 var(--wood-dark);
+    text-align:center;
+    letter-spacing:1px;
+    margin-bottom:8px;
+  }
+  .statrow{ display:flex; gap:8px; justify-content:space-between; align-items:center;}
+  .statchip{
+    flex:1; background:var(--wood-dark); border:2px solid var(--gold); border-radius:2px;
+    padding:4px 6px; text-align:center; font-size:16px; color:var(--parchment);
+  }
+  .statchip b{ display:block; font-family:'Press Start 2P'; font-size:10px; color:var(--gold-bright); margin-bottom:2px;}
+  #xpbar-wrap{ margin-top:8px; }
+  #xpbar-outer{
+    height:16px; background:var(--wood-dark); border:2px solid var(--gold);
+    position:relative; overflow:hidden; image-rendering:pixelated;
+  }
+  #xpbar-inner{
+    height:100%; background:repeating-linear-gradient(90deg, var(--green-bright) 0 6px, var(--green) 6px 12px);
+    width:0%; transition:width .5s steps(12);
+  }
+  #xplabel{ font-size:13px; text-align:center; color:var(--parchment-dark); margin-top:2px;}
+
+  /* ---------- layout ---------- */
+  main{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    padding:14px 12px 24px;
+    max-width:520px; width:100%; margin:0 auto;
+  }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+  .screen.active.slide-right{ animation:slideInRight .28s ease-out; }
+  .screen.active.slide-left{ animation:slideInLeft .28s ease-out; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes slideInRight{ from{opacity:0; transform:translateX(38px);} to{opacity:1; transform:translateX(0);} }
+  @keyframes slideInLeft{ from{opacity:0; transform:translateX(-38px);} to{opacity:1; transform:translateX(0);} }
+
+  .panel{
+    background:var(--parchment);
+    border:4px solid var(--wood-light);
+    box-shadow: inset 0 0 0 2px var(--parchment-dark), 4px 4px 0 rgba(0,0,0,0.45);
+    border-radius:2px;
+    padding:14px;
+    margin-bottom:16px;
+    position:relative;
+  }
+  .panel h2{
+    font-family:'Press Start 2P'; font-size:13px; margin:0 0 10px 0; color:var(--wood-light);
+    border-bottom:3px dashed var(--wood-light); padding-bottom:8px;
+  }
+  .panel h3{
+    font-family:'Press Start 2P'; font-size:10px; margin:14px 0 8px; color:var(--red);
+  }
+  .sub{ color:#5a4a30; font-size:16px; margin:-4px 0 10px; }
+
+  /* weight input */
+  .weightrow{ display:flex; gap:8px; align-items:center; margin-bottom:6px;}
+  .weightrow input{
+    flex:1; font-family:'VT323'; font-size:24px; text-align:center;
+    background:#fff8e6; border:3px solid var(--wood-light); padding:6px; border-radius:2px; color:var(--ink);
+  }
+  .btn{
+    font-family:'Press Start 2P'; font-size:10px; cursor:pointer;
+    background:var(--gold); color:var(--wood-dark); border:3px solid var(--wood-light);
+    box-shadow:3px 3px 0 rgba(0,0,0,0.4);
+    padding:10px 12px; border-radius:2px; text-align:center;
+    transition:transform .05s;
+  }
+  .btn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 rgba(0,0,0,0.4); }
+  .btn.small{ font-size:9px; padding:8px 10px; }
+  .btn.green{ background:var(--green-bright); }
+  .btn.red{ background:var(--red-bright); color:#fff; }
+  .btn.teal{ background:var(--teal); color:#fff; }
+  .btn.disabled{ opacity:.45; pointer-events:none; }
+  .btn-row{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  /* level path (signature element) */
+  .levelpath{ position:relative; padding:10px 4px 4px; }
+  .levelnode{
+    display:flex; gap:10px; align-items:flex-start; position:relative;
+    padding:10px 0 26px 0; margin-left:4px;
+  }
+  .levelnode:last-child{ padding-bottom:6px; }
+  .levelnode::before{ /* dotted trail */
+    content:''; position:absolute; left:18px; top:38px; bottom:-4px; width:0;
+    border-left:4px dotted var(--wood-light);
+  }
+  .levelnode:last-child::before{ display:none; }
+  .node-badge{
+    width:38px; height:38px; min-width:38px; border-radius:50%;
+    background:var(--lock); border:3px solid var(--wood-light);
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+    box-shadow:2px 2px 0 rgba(0,0,0,0.35);
+  }
+  .levelnode.done .node-badge{ background:var(--green-bright); }
+  .levelnode.current .node-badge{ background:var(--gold-bright); animation:pulse 1s infinite steps(6); }
+  @keyframes pulse{ 0%,100%{ box-shadow:2px 2px 0 rgba(0,0,0,0.35);} 50%{ box-shadow:2px 2px 0 rgba(0,0,0,0.35), 0 0 0 4px rgba(241,201,72,0.5);} }
+  .node-body b{ font-size:19px; }
+  .node-body .kg{ font-family:'Press Start 2P'; font-size:11px; color:var(--wood-light); }
+  .node-body .rew{ font-size:16px; color:#4a3a20; }
+  .tag{
+    display:inline-block; font-family:'Press Start 2P'; font-size:8px; padding:3px 6px;
+    border-radius:2px; margin-left:6px; vertical-align:middle;
+  }
+  .tag.done{ background:var(--green-bright); color:#123; }
+  .tag.now{ background:var(--gold-bright); color:#432; }
+  .tag.locked{ background:var(--lock); color:#fff; }
+
+  /* quest list */
+  .quest{
+    display:flex; align-items:center; gap:10px; padding:9px 6px;
+    border-bottom:2px dashed var(--parchment-dark); cursor:pointer;
+  }
+  .quest:last-child{ border-bottom:none; }
+  .checkbox{
+    width:26px; height:26px; min-width:26px; border:3px solid var(--wood-light);
+    background:#fff8e6; display:flex; align-items:center; justify-content:center;
+    font-size:16px; border-radius:2px;
+  }
+  .quest.checked .checkbox{ background:var(--green-bright); }
+  .quest .label{ flex:1; font-size:18px; }
+  .quest.checked .label{ text-decoration:line-through; color:#6a6a50; }
+  .xp-pill{
+    font-family:'Press Start 2P'; font-size:9px; background:var(--wood-light); color:var(--gold-bright);
+    padding:4px 6px; border-radius:2px; white-space:nowrap;
+  }
+
+  /* quest cards (RPG) */
+  .questcard{
+    padding:10px 8px; border-bottom:2px dashed var(--parchment-dark);
+  }
+  .questcard:last-child{ border-bottom:none; }
+  .qc-header{ display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .qc-icon{ font-size:22px; }
+  .qc-titles{ flex:1; }
+  .qc-titles b{ font-size:17px; display:block; }
+  .qc-titles span{ font-size:14px; color:#5a4a30; display:block; }
+  .qc-checkbox{
+    width:24px; height:24px; min-width:24px; border:3px solid var(--wood-light);
+    background:#fff8e6; display:flex; align-items:center; justify-content:center;
+    font-size:14px; border-radius:2px;
+  }
+  .questcard.done .qc-checkbox{ background:var(--green-bright); }
+  .questcard.done .qc-titles b{ text-decoration:line-through; color:#6a6a50; }
+  .qc-reward{ font-size:13px; color:var(--wood-light); margin:6px 0 0 30px; }
+  .qc-progress-row{ display:flex; align-items:center; gap:8px; margin:8px 0 4px 30px; }
+  .qc-input{
+    width:70px; font-family:'VT323'; font-size:20px; text-align:center;
+    background:#fff8e6; border:2px solid var(--wood-light); border-radius:2px; padding:4px;
+  }
+  .qc-target{ font-size:14px; color:#5a4a30; }
+  .qc-bar-outer{ height:12px; background:var(--wood-dark); border:2px solid var(--gold); margin:0 0 0 30px; }
+  .qc-bar-inner{ height:100%; background:repeating-linear-gradient(90deg, var(--green-bright) 0 5px, var(--green) 5px 10px); width:0%; transition:width .3s steps(8); }
+
+  /* boss cards */
+  .bosscard{
+    background:#f6e9c8; border:3px solid var(--red); border-radius:2px; padding:12px; margin-bottom:12px;
+  }
+  .bosscard h4{ font-family:'Press Start 2P'; font-size:11px; color:var(--red); margin:0 0 6px;}
+  .bosscard p{ margin:4px 0 10px; font-size:17px; }
+
+  /* classes grid */
+  .classgrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .classcard{
+    border:3px solid var(--wood-light); background:#f6e9c8; border-radius:2px; padding:10px; text-align:center;
+  }
+  .classcard.active{ background:var(--gold-bright); box-shadow:2px 2px 0 rgba(0,0,0,.3); }
+  .classcard .icon{ font-size:26px; }
+  .classcard b{ display:block; font-family:'Press Start 2P'; font-size:9px; margin:6px 0 4px; }
+  .classcard p{ font-size:14px; margin:0; color:#4a3a20; }
+
+  /* achievements */
+  .ach{ display:flex; align-items:center; gap:10px; padding:9px 6px; border-bottom:2px dashed var(--parchment-dark); }
+  .ach:last-child{ border-bottom:none; }
+  .ach .medal{ font-size:26px; }
+  .ach .info{ flex:1; }
+  .ach .info b{ font-size:18px; display:block; }
+  .ach .info span{ font-size:14px; color:#5a4a30; }
+  .ach.claimed{ opacity:.6; }
+
+  /* challenge */
+  .challengebox{
+    background:#f6e9c8; border:3px dashed var(--teal); border-radius:2px; padding:14px; text-align:center;
+  }
+  .challengebox .txt{ font-size:19px; margin:8px 0 12px; color:var(--teal); font-weight:bold;}
+
+  /* final quest */
+  .finalprog-outer{ height:20px; background:var(--wood-dark); border:2px solid var(--gold); margin-bottom:14px;}
+  .finalprog-inner{ height:100%; background:repeating-linear-gradient(90deg, var(--gold-bright) 0 6px, var(--gold) 6px 12px); width:0%; transition:width .4s steps(10);}
+
+  footer.note{ text-align:center; font-size:13px; color:#8a7c5c; padding:10px 20px 4px; }
+
+  /* bottom tab bar */
+  nav#tabbar{
+    flex-shrink:0; z-index:30;
+    background:var(--wood); border-top:4px solid var(--wood-dark);
+    display:flex; padding:6px 4px calc(6px + env(safe-area-inset-bottom)) 4px;
+  }
+  nav#tabbar button{
+    flex:1; background:none; border:none; color:var(--parchment-dark);
+    font-family:'Press Start 2P'; font-size:7px; display:flex; flex-direction:column;
+    align-items:center; gap:3px; padding:8px 1px; border-radius:4px;
+  }
+  nav#tabbar button .ic{ font-size:18px; }
+  nav#tabbar button.active{ color:var(--gold-bright); background:rgba(212,160,23,0.15); }
+
+  .toast{
+    position:fixed; top:14px; left:50%; transform:translate(-50%,-140%);
+    background:var(--gold-bright); color:var(--wood-dark); font-family:'Press Start 2P';
+    font-size:11px; padding:12px 16px; border:3px solid var(--wood-light); border-radius:3px;
+    box-shadow:3px 3px 0 rgba(0,0,0,.4); z-index:100; transition:transform .35s steps(8);
+    text-align:center; max-width:80%;
+  }
+  .toast.show{ transform:translate(-50%,0); }
+
+  /* history */
+  .histrow{ display:flex; align-items:center; gap:10px; padding:8px 6px; border-bottom:2px dashed var(--parchment-dark); }
+  .histrow:last-child{ border-bottom:none; }
+  .histrow .hemoji{ font-size:20px; }
+  .histrow .hday{ flex:1; font-size:17px; text-transform:capitalize; }
+  .histrow .hpct{ font-family:'Press Start 2P'; font-size:10px; color:var(--wood-light); }
+  .empty-note{ font-size:16px; color:#8a7c5c; text-align:center; padding:8px 0; }
+
+  /* dashboard */
+  .dash-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+  .dash-tile{ background:#f6e9c8; border:2px solid var(--wood-light); border-radius:2px; padding:8px; text-align:center; }
+  .dash-tile b{ display:block; font-family:'Press Start 2P'; font-size:14px; color:var(--wood-light); }
+  .dash-tile span{ font-size:13px; color:#5a4a30; }
+  .dash-bar-outer{ height:14px; background:var(--wood-dark); border:2px solid var(--gold); margin:6px 0 10px; }
+  .dash-bar-inner{ height:100%; background:repeating-linear-gradient(90deg, var(--gold-bright) 0 5px, var(--gold) 5px 10px); width:0%; transition:width .4s steps(10); }
+  .next-obj{ background:#f6e9c8; border:2px dashed var(--wood-light); border-radius:2px; padding:10px; text-align:center; }
+
+  /* world map */
+  .mapzone{
+    display:flex; align-items:center; gap:12px; padding:12px 8px; border-bottom:2px dashed var(--parchment-dark);
+  }
+  .mapzone:last-child{ border-bottom:none; }
+  .mz-icon{ font-size:28px; position:relative; min-width:36px; text-align:center; }
+  .mz-avatar{ position:absolute; top:-14px; right:-8px; font-size:16px; animation:comboFlicker 1.2s steps(4) infinite; }
+  .mz-info{ flex:1; }
+  .mz-info b{ font-size:17px; display:block; }
+  .mz-info span{ font-size:14px; color:#5a4a30; display:block; }
+  .mapzone.fogged{ opacity:.55; filter:grayscale(1); }
+  .mapzone.fogged .mz-icon{ font-size:24px; }
+  .mapzone.current{ background:rgba(212,160,23,0.18); border-radius:2px; }
+  .mapzone.current .mz-info b{ color:var(--wood-light); }
+
+  #zone-canvas{
+    width:100%; height:auto; aspect-ratio:320/200;
+    image-rendering:pixelated; image-rendering:crisp-edges;
+    border:3px solid var(--wood-light); box-shadow:2px 2px 0 rgba(0,0,0,.3);
+    display:block; margin-bottom:12px; background:#000;
+  }
+  .next-obj b{ font-family:'Press Start 2P'; font-size:11px; color:var(--red); display:block; margin-bottom:6px; }
+
+  /* weight chart */
+  #weight-chart{
+    width:100%; height:130px; background:var(--wood-dark); border:2px solid var(--gold);
+    display:block; margin:8px 0 10px; shape-rendering:crispEdges;
+  }
+  #steps-chart{
+    width:100%; height:110px; background:var(--wood-dark); border:2px solid var(--gold);
+    display:block; margin:8px 0 10px; shape-rendering:crispEdges;
+  }
+
+  /* daily event */
+  .eventbox{
+    background:#f0e6d0; border:3px dashed var(--teal); border-radius:2px; padding:14px; text-align:center;
+  }
+  .eventbox h4{ font-family:'Press Start 2P'; font-size:11px; color:var(--teal); margin:0 0 8px; }
+  .eventbox p{ font-size:17px; margin:4px 0 10px; }
+
+  /* rewards */
+  .reward-row{
+    display:flex; align-items:center; gap:10px; padding:10px 6px; border-bottom:2px dashed var(--parchment-dark);
+  }
+  .reward-row:last-child{ border-bottom:none; }
+  .reward-row .ricon{ font-size:24px; }
+  .reward-row .rinfo{ flex:1; }
+  .reward-row .rinfo b{ font-size:18px; display:block; }
+  .reward-row .rinfo span{ font-size:14px; color:#5a4a30; }
+  .reward-row.locked{ opacity:.5; }
+  .reward-row.claimed{ opacity:.6; }
+
+  /* avatar */
+  .avatar-card{ text-align:center; padding:6px 0 4px; }
+  #avatar-canvas{
+    width:120px; height:auto; aspect-ratio:128/168; margin:0 auto;
+    image-rendering:pixelated; image-rendering:crisp-edges;
+    display:block; filter:drop-shadow(3px 3px 0 rgba(0,0,0,.3));
+  }
+  .avatar-title{ font-size:12px; color:var(--wood-light); margin:10px 0 12px; }
+  .avatar-slots{ display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+  .avatar-slot{
+    width:36px; height:36px; border:2px solid var(--wood-light); background:#f6e9c8;
+    border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:18px;
+  }
+  .avatar-slot.empty{ opacity:.3; }
+
+  .equip-group-title{ font-family:'Press Start 2P'; font-size:9px; color:var(--red); margin:12px 0 6px; }
+  .equip-item{
+    display:flex; align-items:center; gap:10px; padding:8px 6px; border-bottom:2px dashed var(--parchment-dark);
+  }
+  .equip-item:last-child{ border-bottom:none; }
+  .equip-item .eicon{ font-size:22px; width:30px; text-align:center; }
+  .equip-item .einfo{ flex:1; font-size:15px; }
+  .equip-item.locked{ opacity:.45; }
+  .equip-item.equipped{ background:rgba(212,160,23,0.18); }
+
+  /* chests */
+  .chest-row{
+    display:flex; align-items:center; gap:12px; padding:12px 8px; border-bottom:2px dashed var(--parchment-dark);
+  }
+  .chest-row:last-child{ border-bottom:none; }
+  .chest-row .cicon{ font-size:30px; }
+  .chest-row .cinfo{ flex:1; font-size:17px; }
+  .coin-badge{
+    display:inline-block; font-family:'Press Start 2P'; font-size:11px; color:var(--gold-bright);
+    background:var(--wood-dark); border:2px solid var(--gold); border-radius:2px; padding:5px 8px;
+  }
+
+  /* combo */
+  .combo-display{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  .combo-flame{ font-size:44px; filter:drop-shadow(2px 2px 0 rgba(0,0,0,.3)); }
+  .combo-flame.hot{ animation:comboFlicker .8s steps(4) infinite; }
+  @keyframes comboFlicker{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.12) rotate(-3deg); } }
+  .combo-count{ font-size:26px; color:var(--red); text-shadow:2px 2px 0 var(--wood-dark); }
+  .combo-danger{
+    margin-top:10px; background:#f6d9c8; border:2px solid var(--red); border-radius:2px;
+    padding:10px; text-align:center; font-size:16px; color:var(--red-bright); font-weight:bold;
+  }
+
+  /* side quests */
+  .squest{
+    display:flex; align-items:flex-start; gap:10px; padding:10px 6px; border-bottom:2px dashed var(--parchment-dark);
+  }
+  .squest:last-child{ border-bottom:none; }
+  .squest .checkbox{ margin-top:2px; }
+  .squest .sinfo{ flex:1; }
+  .squest .sinfo b{ font-size:17px; display:block; }
+  .squest .sinfo span{ font-size:14px; color:#5a4a30; display:block; }
+  .squest .sscope{ font-family:'Press Start 2P'; font-size:7px; color:var(--teal); margin-top:3px; display:inline-block; }
+  .squest.done .sinfo b{ text-decoration:line-through; color:#6a6a50; }
+  .squest.locked{ opacity:.6; }
+
+  /* level up overlay */
+  #levelup-overlay{
+    position:fixed; inset:0; background:rgba(10,7,4,0.94); z-index:200;
+    display:none; align-items:center; justify-content:center; flex-direction:column;
+    text-align:center; padding:24px;
+  }
+  #levelup-overlay.show{ display:flex; animation:overlayIn .3s steps(6); }
+  @keyframes overlayIn{ from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
+  .levelup-swords{ font-size:26px; letter-spacing:8px; color:var(--gold-bright); margin-bottom:16px; animation:blink 1s steps(2) infinite; }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+  .levelup-title{ font-family:'Press Start 2P'; font-size:15px; color:var(--gold-bright); text-shadow:3px 3px 0 var(--wood-dark); margin-bottom:16px; line-height:2; }
+  .levelup-sub{ font-family:'VT323'; font-size:20px; color:#f2e8d0; margin-bottom:10px; line-height:1.5; }
+  .levelup-tap{ font-family:'Press Start 2P'; font-size:9px; color:var(--parchment-dark); margin-top:22px; }
+
+  /* exercise modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,7,4,0.85); z-index:250;
+    display:none; align-items:center; justify-content:center; padding:16px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:var(--parchment); border:4px solid var(--wood-light);
+    box-shadow:6px 6px 0 rgba(0,0,0,0.4); border-radius:2px;
+    max-width:480px; width:100%; max-height:82vh; overflow-y:auto; padding:16px;
+  }
+  .modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .modal-close{
+    cursor:pointer; font-family:'Press Start 2P'; font-size:13px; color:var(--red);
+    border:2px solid var(--red); border-radius:2px; padding:4px 8px; background:#fff8e6;
+  }
+  #exercise-select{
+    width:100%; font-family:'VT323'; font-size:20px; padding:8px;
+    border:3px solid var(--wood-light); background:#fff8e6; border-radius:2px; margin-bottom:14px;
+  }
+  #exercise-info{ font-size:17px; }
+  #exercise-info .ex-muscles{ color:var(--wood-light); font-weight:bold; margin-bottom:8px; }
+  #exercise-info .ex-how{ line-height:1.4; }
+  #exercise-info .ex-placeholder{ color:#8a7c5c; text-align:center; padding:10px 0; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="title">⚔️ PROJECT HUGO</div>
+  <div class="statrow">
+    <div class="statchip"><b>NIVEAU</b><span id="hud-level">1</span></div>
+    <div class="statchip"><b>POIDS</b><span id="hud-weight">96 kg</span></div>
+    <div class="statchip"><b>XP TOTAL</b><span id="hud-xp">0</span></div>
+  </div>
+  <div id="xpbar-wrap">
+    <div id="xpbar-outer"><div id="xpbar-inner"></div></div>
+    <div id="xplabel">0 / 100 vers le prochain palier</div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ===== ACCUEIL ===== -->
+  <section class="screen active" id="screen-accueil">
+    <div class="panel">
+      <h2>📊 TABLEAU DE BORD</h2>
+      <div class="dash-grid">
+        <div class="dash-tile"><b id="dash-lvltitle">Recrue</b><span>Niveau XP</span></div>
+        <div class="dash-tile"><b id="dash-lost">0 kg</b><span>Perdus depuis le départ</span></div>
+        <div class="dash-tile"><b id="dash-streak">0</b><span>🔥 Jours de série</span></div>
+        <div class="dash-tile"><b id="dash-achcount">0/10</b><span>🏆 Succès</span></div>
+      </div>
+      <p class="sub" style="margin:0 0 4px;">Progression vers <b id="dash-goal-label">88 kg</b></p>
+      <div class="dash-bar-outer"><div class="dash-bar-inner" id="dash-weightbar"></div></div>
+      <p class="sub" style="margin:0 0 4px;">📅 Aujourd'hui : <b id="dash-todaycount">0/0</b> quêtes — <b id="dash-todayxp">+0 XP</b></p>
+      <div class="dash-bar-outer"><div class="dash-bar-inner" id="dash-todaybar"></div></div>
+      <div class="next-obj">
+        <b id="dash-nextlabel">🎯 PROCHAIN OBJECTIF</b>
+        <div id="dash-nexttext"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🏆 OBJECTIF</h2>
+      <p class="sub">Débloquer la version « Hugo 2.0 »</p>
+      <div class="weightrow">
+        <span class="pixel-font" style="font-size:10px;color:var(--wood-light);">POIDS</span>
+        <input type="number" id="input-weight" step="0.1" inputmode="decimal">
+        <span class="pixel-font" style="font-size:10px;color:var(--wood-light);">KG</span>
+      </div>
+      <div class="btn-row">
+        <div class="btn green small" id="btn-save-weight">✅ Mettre à jour</div>
+      </div>
+      <p class="sub" style="margin-top:10px;">📏 Taille : 1,87 m &nbsp;|&nbsp; Départ : 96 kg</p>
+      <h3 style="margin-top:16px;">🎯 Objectif final</h3>
+      <div class="weightrow">
+        <span class="pixel-font" style="font-size:10px;color:var(--wood-light);">CIBLE</span>
+        <input type="number" id="input-goal" step="0.1" inputmode="decimal">
+        <span class="pixel-font" style="font-size:10px;color:var(--wood-light);">KG</span>
+      </div>
+      <div class="btn-row">
+        <div class="btn teal small" id="btn-save-goal">🎯 Valider l'objectif</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>📉 ÉVOLUTION DU POIDS</h2>
+      <div class="dash-grid">
+        <div class="dash-tile"><b id="wh-start">96 kg</b><span>Poids de départ</span></div>
+        <div class="dash-tile"><b id="wh-lost">0 kg</b><span>Perdus</span></div>
+        <div class="dash-tile"><b id="wh-best">96 kg</b><span>Meilleur poids</span></div>
+        <div class="dash-tile"><b id="wh-remaining">8 kg</b><span>Restant vers <span id="wh-goal-label">88 kg</span></span></div>
+      </div>
+      <svg id="weight-chart" viewBox="0 0 300 120" preserveAspectRatio="none"></svg>
+      <div id="weight-history-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🗺️ LA VOIE VERS HUGO 2.0</h2>
+      <div class="levelpath" id="levelpath"></div>
+    </div>
+  </section>
+
+  <!-- ===== QUETES ===== -->
+  <section class="screen" id="screen-quetes">
+    <div class="panel">
+      <h2>🔥 COMBO</h2>
+      <div class="combo-display">
+        <div class="combo-flame" id="combo-flame">🔥</div>
+        <div class="combo-count pixel-font" id="combo-count">×0</div>
+      </div>
+      <div class="combo-danger" id="combo-danger" style="display:none;">⚠️ TON COMBO EST EN DANGER ! Termine tes quêtes du jour pour le préserver.</div>
+      <p class="sub" style="text-align:center; margin:8px 0 0;">🏆 Meilleure série : <b id="best-streak">0</b> jour(s)</p>
+    </div>
+
+    <div class="panel">
+      <h2>🃏 JOKER DE RÉSILIENCE</h2>
+      <p class="sub">Protège une journée en cas d'imprévu, sans casser ton combo. Jokers disponibles : <b id="joker-count">1</b></p>
+      <div class="btn-row">
+        <div class="btn teal small" id="btn-protect-today" style="display:none;">🃏 Protéger aujourd'hui</div>
+      </div>
+      <div class="eventbox" id="joker-recovery" style="display:none; margin-top:10px;">
+        <h4>⚠️ COMBO INTERROMPU</h4>
+        <p id="joker-recovery-text"></p>
+        <div class="btn-row" style="justify-content:center;">
+          <div class="btn green small" id="btn-joker-recover">🃏 Sauver mon combo</div>
+          <div class="btn small" id="btn-joker-dismiss">Non merci</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 id="q-theme-title">📜 QUÊTES DU JOUR</h2>
+      <p class="sub" id="today-date"></p>
+      <h3>⚔️ Quêtes principales</h3>
+      <div id="q-main"></div>
+      <p class="sub" style="margin-top:10px;">🔥 Série en cours : <b id="streak-count">0</b> jour(s)</p>
+    </div>
+
+    <div class="panel">
+      <h2>🧭 QUÊTES SECONDAIRES</h2>
+      <p class="sub">Optionnelles, elles changent chaque jour et rapportent XP + pièces bonus.</p>
+      <div id="sidequests-list"></div>
+    </div>
+
+    <div class="panel" id="event-panel" style="display:none;">
+      <h2>⚡ ÉVÉNEMENT DU JOUR</h2>
+      <div class="eventbox" id="eventbox"></div>
+    </div>
+
+    <div class="panel" id="chests-panel" style="display:none;">
+      <h2>🎁 COFFRES</h2>
+      <p class="sub">Gagnés en accomplissant de grosses missions.</p>
+      <div id="chests-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>📅 HISTORIQUE</h2>
+      <p class="sub">Taux de réussite : <b id="success-rate">—</b></p>
+      <div id="history-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>👹 LES BOSS</h2>
+      <div class="bosscard">
+        <h4>👹 Boss du samedi — Un resto</h4>
+        <p>Mission : manger normalement, sans te gaver.</p>
+        <div class="btn-row">
+          <div class="btn red small" id="btn-boss-week">⚔️ Victoire (+100 XP)</div>
+        </div>
+      </div>
+      <div class="bosscard">
+        <h4>🎂 Boss anniversaire — Manger du gâteau</h4>
+        <p>Aucune culpabilité. Tu reprends le programme demain.</p>
+        <div class="btn-row">
+          <div class="btn teal small" id="btn-boss-anniv">🎂 Affronté sans culpabilité</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🎲 DÉFI DE LA SEMAINE</h2>
+      <div class="challengebox" id="challengebox">
+        <div class="txt" id="challenge-text">Aucun défi tiré cette semaine.</div>
+        <div class="btn-row" style="justify-content:center;">
+          <div class="btn small" id="btn-draw-challenge">🎲 Tirer un défi</div>
+          <div class="btn green small" id="btn-complete-challenge" style="display:none;">✅ Défi relevé (+40 XP)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CARTE ===== -->
+  <section class="screen" id="screen-carte">
+    <div class="panel">
+      <h2>🗺️ LA CARTE DU MONDE</h2>
+      <p class="sub">Chaque pas réel te fait avancer physiquement dans ce monde.</p>
+      <canvas id="zone-canvas" width="320" height="200"></canvas>
+      <div class="dash-grid">
+        <div class="dash-tile"><b id="map-steps-total">0</b><span>👣 Pas cumulés</span></div>
+        <div class="dash-tile"><b id="map-current-zone">🌱</b><span>Zone actuelle</span></div>
+      </div>
+      <p class="sub" id="map-next-info" style="text-align:center; margin:8px 0 4px;"></p>
+      <div class="dash-bar-outer"><div class="dash-bar-inner" id="map-progress-bar"></div></div>
+
+      <h3 style="margin-top:16px;">📝 Noter mes pas du jour</h3>
+      <div class="weightrow">
+        <span class="pixel-font" style="font-size:10px;color:var(--wood-light);">PAS</span>
+        <input type="number" id="input-daily-steps" min="0" inputmode="numeric">
+        <span class="pixel-font" style="font-size:10px;color:var(--wood-light);">/ <span id="daily-steps-target">8000</span></span>
+      </div>
+      <div class="btn-row">
+        <div class="btn teal small" id="btn-save-daily-steps">📝 Valider mes pas</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🧭 TON CHEMIN</h2>
+      <div id="map-path"></div>
+    </div>
+
+    <div class="panel">
+      <h2>📊 HISTORIQUE DES PAS</h2>
+      <p class="sub">Depuis que tu utilises l'application.</p>
+      <svg id="steps-chart" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
+      <div id="steps-history-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>💪 EXERCICES</h2>
+      <p class="sub">Une bibliothèque d'exercices à consulter à tout moment.</p>
+      <div class="btn-row">
+        <div class="btn teal small" id="btn-open-no-equip">🏠 Sans matériel</div>
+        <div class="btn teal small" id="btn-open-equip">🎒 Avec matériel</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GUILDE ===== -->
+  <section class="screen" id="screen-guilde">
+    <div class="panel">
+      <h2>👤 TON PERSONNAGE</h2>
+      <div class="avatar-card">
+        <canvas id="avatar-canvas" width="128" height="168"></canvas>
+        <div class="avatar-title pixel-font" id="avatar-title">HUGO 1.0</div>
+        <div class="coin-badge">🪙 <span id="coin-balance">0</span></div>
+        <div class="avatar-slots" id="avatar-slots" style="margin-top:12px;"></div>
+      </div>
+      <h3 style="margin-top:14px;">🎒 ÉQUIPEMENT</h3>
+      <p class="sub">Débloqué via tes succès. Touche un objet pour l'équiper / le retirer.</p>
+      <div id="equipment-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🛡️ CHOISIS TA CLASSE</h2>
+      <p class="sub">Tu peux en débloquer plusieurs.</p>
+      <div class="classgrid" id="classgrid"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🎁 RÉCOMPENSES</h2>
+      <p class="sub">Débloquées en atteignant les paliers de poids.</p>
+      <div id="rewards-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🥇 SUCCÈS</h2>
+      <div id="ach-list"></div>
+    </div>
+  </section>
+
+  <!-- ===== QUETE FINALE ===== -->
+  <section class="screen" id="screen-final">
+    <div class="panel">
+      <h2>🏆 MISSION : « PAPA EN PLEINE FORME »</h2>
+      <p class="sub">À accomplir avant l'arrivée d'Agathe</p>
+      <div class="finalprog-outer"><div class="finalprog-inner" id="final-progress"></div></div>
+      <div id="final-list"></div>
+    </div>
+    <footer class="note">Chaque case cochée est un pas de plus vers Hugo 2.0. 💪</footer>
+  </section>
+
+</main>
+
+<nav id="tabbar">
+  <button data-screen="accueil" class="active"><span class="ic">🏠</span>QG</button>
+  <button data-screen="quetes"><span class="ic">📜</span>QUÊTES</button>
+  <button data-screen="carte"><span class="ic">🗺️</span>CARTE</button>
+  <button data-screen="guilde"><span class="ic">🛡️</span>GUILDE</button>
+  <button data-screen="final"><span class="ic">🏆</span>FINALE</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<div id="levelup-overlay">
+  <div class="levelup-swords" id="levelup-banner-top">⚔️⚔️⚔️⚔️⚔️</div>
+  <div class="levelup-title" id="levelup-title">NIVEAU SUPÉRIEUR !</div>
+  <div class="levelup-sub" id="levelup-sub"></div>
+  <div class="levelup-swords" id="levelup-banner-bottom">⚔️⚔️⚔️⚔️⚔️</div>
+  <div class="levelup-tap">(touche l'écran pour continuer)</div>
+</div>
+
+<div id="exercise-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="pixel-font" id="exercise-modal-title" style="font-size:12px;color:var(--wood-light);">EXERCICES</span>
+      <span class="modal-close" id="exercise-modal-close">✕</span>
+    </div>
+    <select id="exercise-select"></select>
+    <div id="exercise-info"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const STORAGE_KEY = "hugo-quest-state";
+  let saveTimer = null;
+
+  // ---------- data definitions ----------
+  const LEVELS = [
+    {n:1, kg:96, reward:"Tu démarres ton aventure."},
+    {n:2, kg:94, reward:"🥤 Un restaurant ou un dessert que tu apprécies."},
+    {n:3, kg:92, reward:"🎁 Tu t'offres un nouveau t-shirt."},
+    {n:4, kg:90, reward:"🎁 Une sortie avec Charline (ciné, resto, activité)."},
+    {n:"MAX", kg:88, reward:"🏆 Une grosse récompense de ton choix (chaussures, montre, jeu vidéo...)."}
+  ];
+  // Renvoie LEVELS avec le palier MAX remplacé par l'objectif final choisi par l'utilisateur
+  function getLevels(){
+    return LEVELS.map((lv, idx) => idx === LEVELS.length - 1 ? Object.assign({}, lv, {kg: state.goalWeight}) : lv);
+  }
+
+  // Catalogue complet des quêtes du jour : 5 principales + 3 secondaires, avec une
+  // ambiance différente chaque jour de la semaine (0=Dimanche ... 6=Samedi).
+  // Le monde de Hugo : chaque zone se révèle avec les pas cumulés (state.stepsTotal)
+  // ---------- bibliothèque d'exercices ----------
+  const EXERCISES_NO_EQUIPMENT = [
+    {group:"🦵 Jambes & fessiers", items:[
+      {name:"Squat", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Debout, pieds écartés à largeur d'épaules, descends les fesses vers l'arrière en pliant les genoux puis remonte en poussant sur tes pieds."},
+      {name:"Squat sumo", muscles:"Fessiers, quadriceps, adducteurs", how:"Écarte largement les pieds avec les pointes légèrement vers l'extérieur, descends en gardant le dos droit puis remonte."},
+      {name:"Squat avec pause", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Effectue un squat classique mais reste immobile 2 à 3 secondes en position basse avant de remonter."},
+      {name:"Squat sauté", muscles:"Quadriceps, fessiers, mollets", how:"Descends en squat puis pousse explosivement dans tes jambes pour sauter avant de retomber doucement et d'enchaîner."},
+      {name:"Fentes avant", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Fais un grand pas vers l'avant, descends jusqu'à ce que tes genoux soient fléchis puis pousse sur ton pied avant pour revenir."},
+      {name:"Fentes arrière", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Recule une jambe, descends ton bassin vers le sol puis pousse sur la jambe avant pour revenir debout."},
+      {name:"Fentes alternées", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Réalise une fente avec une jambe puis alterne avec l'autre à chaque répétition."},
+      {name:"Fentes sautées", muscles:"Quadriceps, fessiers, mollets", how:"En position de fente, saute verticalement et inverse tes jambes en l'air avant de retomber en fente opposée."},
+      {name:"Fentes latérales", muscles:"Fessiers, quadriceps, adducteurs", how:"Fais un grand pas sur le côté, fléchis la jambe qui avance tout en gardant l'autre tendue puis repousse pour revenir."},
+      {name:"Fentes marchées", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Avance progressivement en réalisant une fente à chaque pas en alternant les jambes."},
+      {name:"Bulgarian split squat", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Place un pied derrière toi sur une surface surélevée, descends verticalement puis remonte en poussant sur la jambe avant."},
+      {name:"Pont fessier", muscles:"Grand fessier, ischio-jambiers", how:"Allonge-toi sur le dos, genoux pliés et pieds au sol, puis soulève ton bassin en contractant fortement les fessiers."},
+      {name:"Pont fessier une jambe", muscles:"Fessiers, ischio-jambiers", how:"Allonge-toi sur le dos, tends une jambe vers le haut et soulève ton bassin en poussant avec l'autre pied."},
+      {name:"Hip thrust au sol", muscles:"Grand fessier, ischio-jambiers", how:"Dos au sol et genoux pliés, pousse ton bassin vers le plafond en serrant les fessiers au sommet."},
+      {name:"Élévation latérale de jambe", muscles:"Moyen fessier, abducteurs", how:"Allonge-toi sur le côté et lève lentement la jambe du dessus sans tourner le bassin."},
+      {name:"Élévation arrière de jambe", muscles:"Grand fessier, ischio-jambiers", how:"À quatre pattes, tends une jambe vers l'arrière et vers le haut sans cambrer le dos."},
+      {name:"Donkey kicks", muscles:"Grand fessier, ischio-jambiers", how:"À quatre pattes, garde le genou plié à 90° et pousse ton pied vers le plafond."},
+      {name:"Fire hydrants", muscles:"Moyen fessier, abducteurs", how:"À quatre pattes, lève un genou sur le côté en gardant la jambe pliée puis redescends."},
+      {name:"Wall sit", muscles:"Quadriceps, fessiers", how:"Dos contre un mur, descends jusqu'à avoir les cuisses presque parallèles au sol et maintiens la position."},
+      {name:"Mollets debout", muscles:"Gastrocnémien, soléaire", how:"Debout, monte sur la pointe des pieds en contractant les mollets puis redescends lentement."},
+      {name:"Mollets sur une marche", muscles:"Gastrocnémien, soléaire", how:"Place l'avant de tes pieds sur une marche, laisse descendre les talons puis pousse pour monter sur la pointe des pieds."}
+    ]},
+    {group:"💪 Bras, épaules & poitrine", items:[
+      {name:"Pompes classiques", muscles:"Pectoraux, triceps, épaules", how:"En position de planche, descends ta poitrine vers le sol en pliant les coudes puis repousse pour revenir."},
+      {name:"Pompes sur les genoux", muscles:"Pectoraux, triceps, épaules", how:"Même mouvement qu'une pompe classique mais avec les genoux posés au sol."},
+      {name:"Pompes larges", muscles:"Pectoraux, épaules, triceps", how:"Place tes mains plus écartées que tes épaules puis descends et remonte en gardant le corps aligné."},
+      {name:"Pompes serrées", muscles:"Triceps, pectoraux", how:"Place tes mains proches l'une de l'autre sous ta poitrine puis réalise une pompe en gardant les coudes près du corps."},
+      {name:"Pompes diamant", muscles:"Triceps, pectoraux", how:"Place tes mains rapprochées sous la poitrine avec les pouces et index formant un triangle puis effectue une pompe."},
+      {name:"Pompes inclinées contre un mur", muscles:"Pectoraux, triceps, épaules", how:"Place tes mains contre un mur, incline ton corps vers celui-ci puis pousse avec tes bras pour revenir."},
+      {name:"Pompes inclinées sur une table", muscles:"Pectoraux, triceps, épaules", how:"Pose tes mains sur une table solide, garde ton corps droit et réalise une pompe en descendant la poitrine vers le support."},
+      {name:"Pompes déclinées", muscles:"Pectoraux supérieurs, épaules, triceps", how:"Place tes pieds sur une surface stable et surélevée, puis réalise une pompe classique."},
+      {name:"Dips au sol", muscles:"Triceps, épaules", how:"Assis au sol, place tes mains derrière toi puis pousse sur tes bras pour soulever légèrement ton bassin."},
+      {name:"Superman", muscles:"Lombaires, fessiers, épaules", how:"Allongé sur le ventre, soulève simultanément tes bras et tes jambes puis redescends lentement."},
+      {name:"Shoulder taps", muscles:"Épaules, pectoraux, abdominaux", how:"En position de planche, touche alternativement ton épaule opposée avec chaque main en gardant les hanches stables."},
+      {name:"Pike push-ups", muscles:"Épaules, triceps, pectoraux", how:"Place-toi en position de V inversé puis plie les coudes pour rapprocher ta tête du sol avant de repousser."},
+      {name:"Cercles de bras", muscles:"Épaules, deltoïdes", how:"Debout, tends les bras sur les côtés et réalise de petits cercles progressivement plus grands."},
+      {name:"Élévations de bras sans charge", muscles:"Épaules, deltoïdes", how:"Debout, lève lentement tes bras sur les côtés jusqu'à hauteur des épaules puis redescends."}
+    ]},
+    {group:"🔥 Abdominaux & gainage", items:[
+      {name:"Planche classique", muscles:"Abdominaux, obliques, épaules, lombaires", how:"Pose tes avant-bras au sol, tends les jambes et maintiens ton corps parfaitement aligné."},
+      {name:"Planche sur les genoux", muscles:"Abdominaux, épaules", how:"Même position que la planche classique mais garde les genoux au sol pour réduire la difficulté."},
+      {name:"Planche latérale", muscles:"Obliques, abdominaux, épaules", how:"Appuie-toi sur un avant-bras et le côté d'un pied puis maintiens ton corps droit sur le côté."},
+      {name:"Planche latérale avec élévation de jambe", muscles:"Obliques, moyen fessier, épaules", how:"En planche latérale, soulève lentement la jambe supérieure puis redescends-la sans perdre ton équilibre."},
+      {name:"Mountain climbers", muscles:"Abdominaux, épaules, quadriceps", how:"En position de planche, ramène alternativement chaque genou vers ta poitrine à un rythme soutenu."},
+      {name:"Mountain climbers croisés", muscles:"Obliques, abdominaux, épaules", how:"Depuis une planche, ramène ton genou droit vers ton coude gauche puis inverse."},
+      {name:"Crunchs", muscles:"Grand droit de l'abdomen", how:"Allongé sur le dos, genoux pliés, soulève légèrement les épaules en contractant tes abdominaux puis redescends."},
+      {name:"Crunchs inversés", muscles:"Grand droit de l'abdomen, bas des abdos", how:"Allongé sur le dos, ramène tes genoux vers ta poitrine puis soulève légèrement ton bassin avant de redescendre."},
+      {name:"Bicycle crunches", muscles:"Abdominaux, obliques", how:"Allongé sur le dos, pédale avec tes jambes tout en amenant alternativement ton coude vers le genou opposé."},
+      {name:"Russian twists", muscles:"Obliques, abdominaux", how:"Assis, buste légèrement incliné vers l'arrière, tourne ton torse de gauche à droite en gardant les jambes stables."},
+      {name:"Sit-ups", muscles:"Grand droit de l'abdomen, fléchisseurs des hanches", how:"Allongé sur le dos, genoux pliés, relève complètement ton buste vers tes genoux puis redescends."},
+      {name:"Dead bug", muscles:"Abdominaux profonds, transverse", how:"Allongé sur le dos, tends simultanément un bras et la jambe opposée sans décoller le bas du dos du sol."},
+      {name:"Bird dog", muscles:"Abdominaux profonds, fessiers, lombaires", how:"À quatre pattes, tends simultanément un bras et la jambe opposée puis reviens doucement."},
+      {name:"Hollow body hold", muscles:"Grand droit, transverse", how:"Allongé sur le dos, décolle légèrement les épaules et les jambes du sol et maintiens la position."},
+      {name:"Flutter kicks", muscles:"Abdominaux, fléchisseurs des hanches", how:"Allongé sur le dos, garde les jambes légèrement décollées et réalise de petits battements alternés."},
+      {name:"Leg raises", muscles:"Abdominaux, fléchisseurs des hanches", how:"Allongé sur le dos, jambes tendues, monte-les vers le plafond puis redescends lentement sans toucher le sol."},
+      {name:"V-ups", muscles:"Grand droit de l'abdomen, fléchisseurs des hanches", how:"Allongé sur le dos, soulève simultanément ton buste et tes jambes pour essayer de toucher tes pieds."},
+      {name:"Toe touches", muscles:"Grand droit de l'abdomen", how:"Allongé sur le dos, lève tes jambes vers le plafond puis soulève ton buste pour essayer de toucher tes pieds."}
+    ]},
+    {group:"🏃 Cardio & exercices dynamiques", items:[
+      {name:"Jumping jacks", muscles:"Jambes, épaules, mollets", how:"Saute en écartant simultanément les jambes et les bras puis reviens en position initiale."},
+      {name:"Jumping jacks sans saut", muscles:"Jambes, épaules", how:"Écarte alternativement une jambe sur le côté tout en levant les bras au-dessus de ta tête."},
+      {name:"High knees", muscles:"Quadriceps, mollets, abdominaux", how:"Cours sur place en montant alternativement tes genoux le plus haut possible."},
+      {name:"Talons-fesses", muscles:"Ischio-jambiers, mollets", how:"Cours sur place en ramenant alternativement tes talons vers tes fesses."},
+      {name:"Burpees", muscles:"Jambes, pectoraux, épaules, abdominaux", how:"Descends en squat, pose tes mains au sol, envoie tes pieds en arrière, reviens en squat puis saute verticalement."},
+      {name:"Burpees sans saut", muscles:"Jambes, pectoraux, épaules, abdominaux", how:"Effectue le même mouvement qu'un burpee mais termine debout sans effectuer de saut."},
+      {name:"Squat + montée de genou", muscles:"Quadriceps, fessiers, abdominaux", how:"Fais un squat puis, en remontant, lève un genou vers ta poitrine avant de recommencer de l'autre côté."},
+      {name:"Skaters", muscles:"Fessiers, quadriceps, mollets", how:"Saute latéralement d'un pied sur l'autre en ramenant la jambe opposée derrière toi."},
+      {name:"Froggers", muscles:"Quadriceps, fessiers, épaules, abdominaux", how:"Depuis une planche, ramène tes pieds près de tes mains puis retourne rapidement en position de planche."},
+      {name:"Bear crawl", muscles:"Abdominaux, épaules, bras, jambes", how:"À quatre pattes avec les genoux légèrement décollés du sol, avance en déplaçant simultanément la main et le pied opposés."},
+      {name:"Crab walk", muscles:"Triceps, épaules, fessiers, cuisses", how:"Assis avec les mains et les pieds au sol, soulève ton bassin et déplace-toi latéralement."},
+      {name:"Marche rapide sur place", muscles:"Quadriceps, mollets, fessiers", how:"Marche rapidement sur place en balançant naturellement les bras."},
+      {name:"Course sur place", muscles:"Quadriceps, mollets, fessiers", how:"Cours sur place à un rythme régulier en gardant une bonne posture."},
+      {name:"Sprint sur place", muscles:"Quadriceps, mollets, fessiers", how:"Cours sur place le plus rapidement possible pendant une courte durée en montant rapidement les genoux."},
+      {name:"Pas chassés", muscles:"Quadriceps, fessiers, mollets", how:"Déplace-toi rapidement sur le côté en croisant ou en rapprochant les pieds à chaque pas."},
+      {name:"Boxe dans le vide", muscles:"Épaules, triceps, pectoraux, abdominaux", how:"Adopte une position de boxeur et enchaîne des coups de poing rapides dans le vide en bougeant les jambes."}
+    ]}
+  ];
+
+  const EXERCISES_WITH_EQUIPMENT = [
+    {group:"💧 Avec un pack d'eau", items:[
+      {name:"Squat avec pack", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Tiens le pack contre ta poitrine avec les deux mains et réalise un squat classique."},
+      {name:"Goblet squat avec pack", muscles:"Quadriceps, fessiers, adducteurs", how:"Tiens le pack verticalement contre ta poitrine et descends en squat en gardant le buste droit."},
+      {name:"Fentes avec pack", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Tiens le pack contre ton torse ou à bout de bras et réalise des fentes alternées."},
+      {name:"Soulevé de terre avec pack", muscles:"Ischio-jambiers, fessiers, lombaires", how:"Tiens le pack devant tes cuisses, pousse les fesses vers l'arrière en gardant le dos droit puis redresse-toi."},
+      {name:"Romanian deadlift avec pack", muscles:"Ischio-jambiers, fessiers", how:"Avec les jambes légèrement fléchies, descends le pack le long de tes cuisses en reculant les hanches puis remonte."},
+      {name:"Hip thrust avec pack", muscles:"Grand fessier, ischio-jambiers", how:"Allonge-toi sur le dos et pose le pack sur ton bassin avant de pousser les hanches vers le plafond."},
+      {name:"Rowing avec pack", muscles:"Grand dorsal, trapèzes, biceps", how:"Penche ton buste en gardant le dos droit puis tire le pack vers ton ventre en rapprochant les coudes."},
+      {name:"Développé épaules avec pack", muscles:"Épaules, triceps", how:"Tiens le pack devant ta poitrine puis pousse-le au-dessus de ta tête avant de le redescendre."},
+      {name:"Développé poitrine au sol", muscles:"Pectoraux, triceps, épaules", how:"Allonge-toi sur le dos et pousse le pack vers le plafond avant de le redescendre lentement."},
+      {name:"Curl biceps avec bouteilles", muscles:"Biceps", how:"Tiens une bouteille dans chaque main, garde les coudes près du corps et ramène les mains vers les épaules."},
+      {name:"Élévations latérales avec bouteilles", muscles:"Deltoïdes", how:"Tiens une bouteille dans chaque main et lève les bras sur les côtés jusqu'à hauteur des épaules."},
+      {name:"Élévations frontales", muscles:"Deltoïdes antérieurs", how:"Lève alternativement ou simultanément tes bouteilles devant toi jusqu'à hauteur des épaules."},
+      {name:"Extension triceps au-dessus de la tête", muscles:"Triceps", how:"Tiens une bouteille ou un objet lourd au-dessus de ta tête, plie les coudes pour le descendre derrière ta tête puis tends les bras."},
+      {name:"Russian twists avec bouteille", muscles:"Obliques, grand droit", how:"Assis et légèrement penché en arrière, tiens une bouteille à deux mains et fais-la passer d'un côté à l'autre."},
+      {name:"Marche du fermier", muscles:"Avant-bras, épaules, trapèzes, abdominaux, jambes", how:"Porte un pack ou une bouteille lourde dans chaque main et marche en gardant le dos droit et les épaules basses."}
+    ]},
+    {group:"🪑 Avec une chaise", items:[
+      {name:"Step-up", muscles:"Quadriceps, fessiers, mollets", how:"Monte un pied sur une chaise ou une marche très stable, pousse sur ta jambe pour monter puis redescends prudemment."},
+      {name:"Squat vers une chaise", muscles:"Quadriceps, fessiers", how:"Descends lentement jusqu'à toucher légèrement la chaise avec tes fesses puis remonte sans t'asseoir complètement."},
+      {name:"Bulgarian split squat (chaise)", muscles:"Quadriceps, fessiers", how:"Place un pied derrière toi sur la chaise, puis fléchis la jambe avant pour descendre et remonter."},
+      {name:"Fente arrière pied sur chaise", muscles:"Fessiers, quadriceps, ischio-jambiers", how:"Pose le dessus d'un pied sur la chaise derrière toi puis effectue une fente avec la jambe avant."},
+      {name:"Dips sur chaise", muscles:"Triceps, épaules, pectoraux", how:"Place tes mains sur le bord d'une chaise stable derrière toi, avance les pieds puis descends et remonte en pliant les coudes."},
+      {name:"Pompes inclinées sur chaise", muscles:"Pectoraux, triceps, épaules", how:"Pose tes mains sur l'assise d'une chaise stable et réalise des pompes en gardant ton corps droit."},
+      {name:"Pompes pieds sur chaise", muscles:"Pectoraux supérieurs, épaules, triceps", how:"Place tes pieds sur la chaise et tes mains au sol puis effectue une pompe classique."},
+      {name:"Hip thrust sur chaise", muscles:"Grand fessier, ischio-jambiers", how:"Place le haut de ton dos contre l'assise d'une chaise stable, pose un poids sur ton bassin puis pousse les hanches vers le haut."},
+      {name:"Pont fessier pieds sur chaise", muscles:"Fessiers, ischio-jambiers", how:"Allonge-toi au sol, place tes pieds sur la chaise et soulève ton bassin en contractant les fessiers."},
+      {name:"Planche pieds sur chaise", muscles:"Abdominaux, épaules, pectoraux", how:"Place tes pieds sur la chaise et tes mains ou avant-bras au sol puis maintiens ton corps bien droit."},
+      {name:"Mountain climbers mains sur chaise", muscles:"Abdominaux, épaules, jambes", how:"Place tes mains sur la chaise et ramène alternativement tes genoux vers ta poitrine."},
+      {name:"Élévation de genoux assis", muscles:"Abdominaux, fléchisseurs des hanches", how:"Assis au bord de la chaise, tiens-toi légèrement sur les côtés et ramène tes genoux vers ta poitrine."},
+      {name:"Extension de jambes assis", muscles:"Quadriceps", how:"Assis droit sur la chaise, tends une jambe devant toi puis redescends-la lentement."}
+    ]},
+    {group:"🎒 Avec un sac à dos", items:[
+      {name:"Squat avec sac", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Porte le sac sur ton dos ou tiens-le contre ta poitrine puis réalise un squat."},
+      {name:"Good morning", muscles:"Ischio-jambiers, fessiers, lombaires", how:"Place le sac sur ton dos, garde les jambes légèrement fléchies et incline ton buste vers l'avant en reculant les hanches."},
+      {name:"Rowing avec sac", muscles:"Grand dorsal, trapèzes, biceps", how:"Penche ton buste vers l'avant avec le dos droit puis tire le sac vers ton ventre."},
+      {name:"Développé épaules avec sac", muscles:"Épaules, triceps", how:"Tiens le sac devant ta poitrine puis pousse-le au-dessus de ta tête avant de le redescendre."},
+      {name:"Curl biceps avec sac", muscles:"Biceps", how:"Tiens le sac par sa poignée et ramène-le vers ton épaule en gardant ton coude près du corps."},
+      {name:"Extension triceps avec sac", muscles:"Triceps", how:"Tiens le sac au-dessus de ta tête puis plie les coudes pour le descendre derrière ta tête avant de tendre les bras."},
+      {name:"Marche du fermier avec sacs", muscles:"Avant-bras, épaules, trapèzes, abdominaux", how:"Porte un sac dans chaque main et marche en gardant le dos droit et les épaules stables."}
+    ]},
+    {group:"🧴 Avec des bouteilles d'eau", items:[
+      {name:"Curl biceps", muscles:"Biceps", how:"Tiens une bouteille dans chaque main et plie les coudes pour ramener les bouteilles vers tes épaules."},
+      {name:"Curl marteau", muscles:"Biceps, brachial", how:"Tiens les bouteilles avec les paumes face à face puis ramène-les vers tes épaules sans bouger les coudes."},
+      {name:"Élévations latérales (bouteilles)", muscles:"Deltoïdes", how:"Lève les bouteilles sur les côtés jusqu'à la hauteur des épaules puis redescends lentement."},
+      {name:"Élévations frontales (bouteilles)", muscles:"Deltoïdes antérieurs", how:"Lève les bouteilles devant toi jusqu'à hauteur des épaules puis redescends doucement."},
+      {name:"Kickback triceps", muscles:"Triceps", how:"Penche ton buste vers l'avant, garde les coudes fixes près du corps et tends les avant-bras vers l'arrière."},
+      {name:"Développé couché au sol", muscles:"Pectoraux, triceps, épaules", how:"Allonge-toi sur le dos avec une bouteille dans chaque main et pousse-les vers le plafond."},
+      {name:"Goblet squat", muscles:"Quadriceps, fessiers", how:"Tiens une grosse bouteille contre ta poitrine et réalise un squat."}
+    ]},
+    {group:"🧺 Avec un panier à linge", items:[
+      {name:"Squat avec panier", muscles:"Quadriceps, fessiers", how:"Tiens le panier rempli devant ta poitrine et réalise un squat contrôlé."},
+      {name:"Soulevé de terre avec panier", muscles:"Fessiers, ischio-jambiers, lombaires", how:"Tiens le panier devant toi, recule les hanches en gardant le dos droit puis redresse-toi."},
+      {name:"Rowing avec panier", muscles:"Grand dorsal, trapèzes, biceps", how:"Penche ton buste et tire le panier vers ton ventre en gardant les coudes proches du corps."},
+      {name:"Fentes avec panier", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Tiens le panier contre ta poitrine et réalise des fentes alternées."},
+      {name:"Marche du fermier (panier)", muscles:"Avant-bras, épaules, trapèzes, abdominaux", how:"Porte le panier à deux mains devant toi et marche en gardant une posture droite."},
+      {name:"Russian twists avec panier", muscles:"Obliques, abdominaux", how:"Assis et légèrement penché en arrière, tiens le panier et tourne ton buste alternativement à gauche puis à droite."}
+    ]},
+    {group:"🧻 Avec une serviette", items:[
+      {name:"Leg curls glissés", muscles:"Ischio-jambiers, fessiers", how:"Allonge-toi sur le dos, place tes talons sur une serviette et fais glisser tes pieds vers tes fesses puis éloigne-les."},
+      {name:"Mountain climbers glissés (serviette)", muscles:"Abdominaux, épaules, jambes", how:"En position de planche avec les pieds sur une serviette, fais glisser alternativement chaque genou vers ta poitrine."},
+      {name:"Sliding lunges", muscles:"Quadriceps, fessiers, adducteurs", how:"Place un pied sur une serviette et fais-le glisser vers l'arrière tout en descendant en fente."},
+      {name:"Sliding knee tucks", muscles:"Abdominaux, épaules", how:"En position de planche, fais glisser tes deux pieds vers tes mains en ramenant les genoux vers la poitrine."},
+      {name:"Sliding plank", muscles:"Abdominaux, épaules, pectoraux", how:"En position de planche, fais glisser lentement tes pieds ou tes mains pour déplacer ton corps tout en restant gainé."},
+      {name:"Abduction des jambes glissée", muscles:"Abdominaux, adducteurs", how:"En position de planche ou allongé selon la variante, fais glisser une jambe sur le côté puis ramène-la."}
+    ]},
+    {group:"🧦 Avec des chaussettes", items:[
+      {name:"Mountain climbers glissés (chaussettes)", muscles:"Abdominaux, épaules, jambes", how:"En position de planche, fais glisser alternativement tes pieds vers ta poitrine."},
+      {name:"Leg curls (chaussettes)", muscles:"Ischio-jambiers, fessiers", how:"Allongé sur le dos, fais glisser tes talons vers tes fesses puis tends à nouveau les jambes."},
+      {name:"Plank knee tucks", muscles:"Abdominaux, épaules", how:"En position de planche, ramène tes genoux vers ta poitrine en faisant glisser tes pieds sur le sol."},
+      {name:"Lunges glissées", muscles:"Quadriceps, fessiers, ischio-jambiers", how:"Fais glisser une jambe vers l'arrière tout en descendant en fente puis ramène-la vers la position initiale."},
+      {name:"Ouverture-fermeture des jambes en planche", muscles:"Abdominaux, abducteurs, adducteurs", how:"En position de planche, fais glisser tes pieds pour écarter puis rapprocher tes jambes tout en gardant le bassin stable."}
+    ]}
+  ];
+
+  const MAP_ZONES = [
+    {threshold:0, icon:"🌱", name:"Village du Départ", flavor:"Ton aventure commence ici."},
+    {threshold:15000, icon:"🌲", name:"Forêt de la Constance", flavor:"Les arbres se dressent, silencieux et patients — comme toi."},
+    {threshold:35000, icon:"🌊", name:"Rivière de l'Hydratation", flavor:"L'eau claire coule à travers toute la vallée."},
+    {threshold:60000, icon:"🏕️", name:"Campement du Guerrier", flavor:"Des braises encore chaudes, une épée plantée dans le sol."},
+    {threshold:90000, icon:"⛰️", name:"Montagne de la Discipline", flavor:"Le chemin devient raide. Continue."},
+    {threshold:125000, icon:"🏯", name:"Temple du Sage", flavor:"Un lieu de calme, où le repos devient une force."},
+    {threshold:165000, icon:"🗿", name:"Ruines Oubliées", flavor:"Personne ne sait ce qui se cache ici depuis si longtemps."},
+    {threshold:210000, icon:"👑", name:"Royaume de Hugo 2.0", flavor:"La destination finale de ton voyage."}
+  ];
+
+  const DAY_QUESTS = {
+    1: { icon:"🌱", title:"Le départ de l'aventure", main:[
+      {id:"mon_m1", qicon:"👣", qtitle:"Les premiers pas", label:"Atteindre ton objectif de pas", xp:25, coins:20, type:"steps", amount:8000},
+      {id:"mon_m2", qicon:"💧", qtitle:"La source de vie", label:"Boire ton objectif d'eau", xp:20, coins:20},
+      {id:"mon_m3", qicon:"🥗", qtitle:"Le repas du voyageur", label:"Manger au moins un repas équilibré", xp:20, coins:20},
+      {id:"mon_m4", qicon:"🏋️", qtitle:"Réveiller le guerrier", label:"Faire 20 minutes d'activité physique", xp:30, coins:20, type:"seance"},
+      {id:"mon_m5", qicon:"😴", qtitle:"La nuit réparatrice", label:"Te coucher à une heure permettant une bonne nuit", xp:20, coins:20}
+    ], secondary:[
+      {id:"mon_s1", qicon:"🚶", qtitle:"Le détour du village", label:"Faire une marche supplémentaire de 10 minutes", xp:15, coins:10},
+      {id:"mon_s2", qicon:"📸", qtitle:"Preuve de l'aventure", label:"Prendre une photo de ton repas équilibré", xp:15, coins:10},
+      {id:"mon_s3", qicon:"🪙", qtitle:"Le premier trésor", label:"Consulter ton bilan du jour", xp:15, coins:10}
+    ]},
+    2: { icon:"🌲", title:"Le sentier de la régularité", main:[
+      {id:"tue_m1", qicon:"👣", qtitle:"Les premiers pas", label:"Atteindre ton objectif de pas", xp:25, coins:20, type:"steps", amount:8000},
+      {id:"tue_m2", qicon:"💧", qtitle:"La source de vie", label:"Boire ton objectif d'eau", xp:20, coins:20},
+      {id:"tue_m3", qicon:"🥗", qtitle:"Le plein de vitalité", label:"Ajouter au moins 2 portions de légumes ou fruits", xp:20, coins:20},
+      {id:"tue_m4", qicon:"🏃", qtitle:"L'entraînement de l'Éclaireur", label:"Faire une activité physique d'au moins 30 minutes", xp:30, coins:20, type:"seance"},
+      {id:"tue_m5", qicon:"🍽️", qtitle:"Le repas conscient", label:"Prendre au moins un repas sans écran", xp:20, coins:20}
+    ], secondary:[
+      {id:"tue_s1", qicon:"🚶", qtitle:"Le pas de plus", label:"Faire 1 000 pas supplémentaires", xp:15, coins:10},
+      {id:"tue_s2", qicon:"🧘", qtitle:"La pause du voyageur", label:"Prendre 10 minutes pour te détendre", xp:15, coins:10},
+      {id:"tue_s3", qicon:"📖", qtitle:"Le savoir du sentier", label:"Lire le conseil du jour", xp:15, coins:10}
+    ]},
+    3: { icon:"💧", title:"La rivière de l'hydratation", main:[
+      {id:"wed_m1", qicon:"💧", qtitle:"La rivière sacrée", label:"Atteindre ton objectif d'hydratation", xp:20, coins:25},
+      {id:"wed_m2", qicon:"👣", qtitle:"Les premiers pas", label:"Atteindre ton objectif de pas", xp:25, coins:20, type:"steps", amount:8000},
+      {id:"wed_m3", qicon:"🥤", qtitle:"Le choix de l'eau", label:"Remplacer une boisson sucrée par de l'eau ou sans sucre", xp:20, coins:20},
+      {id:"wed_m4", qicon:"🏋️", qtitle:"L'effort du jour", label:"Faire une séance de sport ou une activité physique", xp:30, coins:20, type:"seance"},
+      {id:"wed_m5", qicon:"🍽️", qtitle:"Le repas lent", label:"Manger lentement, prendre au moins 15 minutes", xp:20, coins:20}
+    ], secondary:[
+      {id:"wed_s1", qicon:"💧", qtitle:"Le réveil de la rivière", label:"Boire un verre d'eau supplémentaire au réveil", xp:15, coins:10},
+      {id:"wed_s2", qicon:"🚶", qtitle:"La marche digestive", label:"Faire une petite marche après un repas", xp:15, coins:10},
+      {id:"wed_s3", qicon:"🧊", qtitle:"La saveur nouvelle", label:"Découvrir une nouvelle façon de boire ton eau", xp:15, coins:10}
+    ]},
+    4: { icon:"🏋️", title:"L'épreuve du guerrier", main:[
+      {id:"thu_m1", qicon:"👣", qtitle:"Les premiers pas", label:"Atteindre ton objectif de pas", xp:25, coins:20, type:"steps", amount:8000},
+      {id:"thu_m2", qicon:"🏋️", qtitle:"L'épreuve", label:"Faire une séance sportive", xp:30, coins:20, type:"seance"},
+      {id:"thu_m3", qicon:"💧", qtitle:"La source de vie", label:"Atteindre ton objectif d'hydratation", xp:20, coins:20},
+      {id:"thu_m4", qicon:"🥗", qtitle:"L'assiette du guerrier", label:"Composer une assiette équilibrée", xp:20, coins:20},
+      {id:"thu_m5", qicon:"⚡", qtitle:"Le dernier effort", label:"Faire 5 minutes d'activité supplémentaire après ta séance", xp:15, coins:20}
+    ], secondary:[
+      {id:"thu_s1", qicon:"🪜", qtitle:"Les marches du courage", label:"Prendre les escaliers plutôt que l'ascenseur", xp:15, coins:10},
+      {id:"thu_s2", qicon:"🚶", qtitle:"La marche additionnelle", label:"Faire une marche de 15 minutes", xp:15, coins:10},
+      {id:"thu_s3", qicon:"💪", qtitle:"Le mini-défi", label:"20 squats, 10 pompes adaptées ou 30s de gainage", xp:15, coins:10}
+    ]},
+    5: { icon:"🔥", title:"La forge de la transformation", main:[
+      {id:"fri_m1", qicon:"👣", qtitle:"Les premiers pas", label:"Atteindre ton objectif de pas", xp:25, coins:20, type:"steps", amount:8000},
+      {id:"fri_m2", qicon:"💧", qtitle:"La source de vie", label:"Atteindre ton objectif d'eau", xp:20, coins:20},
+      {id:"fri_m3", qicon:"🥗", qtitle:"Le choix conscient", label:"Faire un choix alimentaire équilibré dans la journée", xp:20, coins:20},
+      {id:"fri_m4", qicon:"🏃", qtitle:"L'effort de fin de semaine", label:"Faire au moins 30 minutes d'activité", xp:30, coins:20, type:"seance"},
+      {id:"fri_m5", qicon:"🔥", qtitle:"La flamme intérieure", label:"Ne pas abandonner ta routine malgré la fatigue", xp:20, coins:20}
+    ], secondary:[
+      {id:"fri_s1", qicon:"🍫", qtitle:"La tentation dominée", label:"Résister à une envie impulsive", xp:15, coins:10},
+      {id:"fri_s2", qicon:"🚶", qtitle:"Le pas supplémentaire", label:"Faire 2 000 pas supplémentaires", xp:15, coins:10},
+      {id:"fri_s3", qicon:"🧘", qtitle:"L'instant pour toi", label:"Prendre 10 minutes pour toi sans écran", xp:15, coins:10}
+    ]},
+    6: { icon:"🏕️", title:"L'expédition sauvage", main:[
+      {id:"sat_m1", qicon:"🥗", qtitle:"Le repas du campement", label:"Préparer ou choisir un repas équilibré", xp:20, coins:20},
+      {id:"sat_m2", qicon:"👣", qtitle:"Les premiers pas", label:"Atteindre ton objectif de pas", xp:25, coins:20, type:"steps", amount:8000},
+      {id:"sat_m3", qicon:"💧", qtitle:"La source de vie", label:"Atteindre ton objectif d'hydratation", xp:20, coins:20},
+      {id:"sat_m4", qicon:"🏃", qtitle:"L'effort libre", label:"Faire une activité physique au choix", xp:30, coins:20, type:"seance"},
+      {id:"sat_m5", qicon:"🌳", qtitle:"L'appel du plein air", label:"Sortir prendre l'air pendant au moins 30 minutes", xp:20, coins:20}
+    ], secondary:[
+      {id:"sat_s1", qicon:"🗺️", qtitle:"La terre inconnue", label:"Découvrir un nouvel endroit à pied", xp:15, coins:10},
+      {id:"sat_s2", qicon:"📸", qtitle:"L'instant capturé", label:"Photographier un moment de ta journée", xp:15, coins:10},
+      {id:"sat_s3", qicon:"👨‍👩‍👧", qtitle:"L'expédition partagée", label:"Faire une activité ou une balade avec quelqu'un", xp:15, coins:10}
+    ]},
+    0: { icon:"👑", title:"Le conseil du Royaume", main:[
+      {id:"sun_m1", qicon:"⚖️", qtitle:"Le bilan de poids", label:"Enregistrer ton poids hebdomadaire si tu le souhaites", xp:15, coins:20},
+      {id:"sun_m2", qicon:"📊", qtitle:"Le conseil des sages", label:"Consulter ton bilan de la semaine", xp:15, coins:20},
+      {id:"sun_m3", qicon:"👣", qtitle:"Les premiers pas", label:"Atteindre ton objectif de pas", xp:25, coins:20, type:"steps", amount:8000},
+      {id:"sun_m4", qicon:"💧", qtitle:"La source de vie", label:"Atteindre ton objectif d'hydratation", xp:20, coins:20},
+      {id:"sun_m5", qicon:"🥗", qtitle:"La préparation du royaume", label:"Planifier un repas équilibré pour la semaine suivante", xp:20, coins:20}
+    ], secondary:[
+      {id:"sun_s1", qicon:"🏆", qtitle:"Le grimoire des exploits", label:"Consulter tes statistiques de la semaine", xp:15, coins:10},
+      {id:"sun_s2", qicon:"🧠", qtitle:"La réflexion du royaume", label:"De quoi suis-je le plus fier cette semaine ?", xp:15, coins:10, note:true},
+      {id:"sun_s3", qicon:"🗺️", qtitle:"Le prochain chapitre", label:"Choisir ton objectif de la semaine prochaine", xp:15, coins:10, note:true}
+    ]}
+  };
+
+  function getActiveDailyQuests(date){
+    return DAY_QUESTS[date.getDay()].main;
+  }
+  function getSecondaryQuests(date){
+    return DAY_QUESTS[date.getDay()].secondary;
+  }
+
+  const CLASSES = [
+    {id:"guerrier", icon:"🛡️", label:"Guerrier", desc:"Tu ne rates jamais une séance."},
+    {id:"eclaireur", icon:"🏃", label:"Éclaireur", desc:"Plus de 10 000 pas / jour."},
+    {id:"chef", icon:"🍳", label:"Chef", desc:"Tu cuisines tous tes repas."},
+    {id:"sage", icon:"😴", label:"Sage", desc:"Tu dors 7h+ chaque nuit."}
+  ];
+
+  // Paliers visuels de l'avatar, basés sur le niveau de poids atteint (voir getLevels())
+  const AVATAR_STAGES = [
+    {emoji:"🧍", title:"HUGO 1.0"},
+    {emoji:"🚶", title:"HUGO EN PROGRESSION"},
+    {emoji:"🏃", title:"HUGO EN PROGRESSION"},
+    {emoji:"💪", title:"HUGO EN PLEINE FORME"},
+    {emoji:"🦸", title:"HUGO 2.0"}
+  ];
+  const AVATAR_BOSS_STAGE = {emoji:"👑", title:"HUGO 3.0 — MODE BOSS"};
+
+  // Rendu visuel pixel-art associé à chaque palier (couleurs + posture)
+  const STAGE_VISUALS = [
+    {shirt:"#9a9a8a", pants:"#5a4a3a", shoe:"#6b5a4a", pose:"slouch", bg:null},
+    {shirt:"#6fae5c", pants:"#3a2a1a", shoe:"#6b5a4a", pose:"walk", bg:null},
+    {shirt:"#5c9a6e", pants:"#2a3a4a", shoe:"#6b5a4a", pose:"jog", bg:null},
+    {shirt:"#d4a017", pants:"#2a2a2a", shoe:"#c9553d", pose:"flex", bg:null},
+    {shirt:"#3d6b6b", pants:"#1a2a3a", shoe:"#f1c948", pose:"hero", bg:"cape"}
+  ];
+  const BOSS_VISUAL = {shirt:"#f1c948", pants:"#8b6b1a", shoe:"#f1c948", pose:"boss", bg:"glow"};
+  const SKIN_COLOR = "#e8b98a";
+  const HAIR_COLOR = "#3d2a1a";
+
+  const SLOT_ORDER = ["outfit","shoes","cap","glasses","weapon","armor","crown"];
+  const SLOT_LABELS = {
+    outfit:"👕 Tenue", shoes:"👟 Chaussures", cap:"🧢 Accessoire", glasses:"🕶️ Lunettes",
+    weapon:"⚔️ Arme symbolique", armor:"🛡️ Armure", crown:"👑 Couronne"
+  };
+  // unlockedBy : "always", un id de succès (state.achievements), ou "reward:<index LEVELS>" (state.rewardsClaimed)
+  const ITEMS = [
+    {id:"outfit_basic", slot:"outfit", emoji:"🎽", label:"Débardeur de recrue", unlockedBy:"always"},
+    {id:"outfit_tshirt", slot:"outfit", emoji:"👕", label:"Nouveau t-shirt (récompense Niveau 3)", unlockedBy:"reward:2"},
+    {id:"shoes_old", slot:"shoes", emoji:"🥿", label:"Vieilles baskets", unlockedBy:"always"},
+    {id:"shoes_new", slot:"shoes", emoji:"👟", label:"Baskets neuves (Boss final)", unlockedBy:"bossfinal"},
+    {id:"cap_basic", slot:"cap", emoji:"🧢", label:"Casquette (succès Incassable)", unlockedBy:"streak7"},
+    {id:"glasses_shades", slot:"glasses", emoji:"🕶️", label:"Lunettes de soleil (30 jours sans abandon)", unlockedBy:"streak30"},
+    {id:"weapon_sword", slot:"weapon", emoji:"⚔️", label:"Épée du Guerrier (10 séances)", unlockedBy:"warrior10"},
+    {id:"armor_shield", slot:"armor", emoji:"🛡️", label:"Bouclier du Marcheur (100 000 pas)", unlockedBy:"walker"},
+    {id:"crown_papa", slot:"crown", emoji:"👑", label:"Couronne de Papa (Mission finale)", unlockedBy:"papaenforme"},
+    {id:"outfit_gold", slot:"outfit", emoji:"👔", label:"Tenue dorée", coinCost:150},
+    {id:"cap_wizard", slot:"cap", emoji:"🎩", label:"Haut-de-forme", coinCost:80},
+    {id:"glasses_star", slot:"glasses", emoji:"🤩", label:"Lunettes étoilées", coinCost:100},
+    {id:"weapon_wand", slot:"weapon", emoji:"🪄", label:"Bâton magique", coinCost:120},
+    {id:"armor_gold", slot:"armor", emoji:"🥋", label:"Armure dorée", coinCost:150}
+  ];
+  function isItemUnlocked(item){
+    if(item.coinCost !== undefined) return !!state.purchasedItems[item.id];
+    if(item.unlockedBy === "always") return true;
+    if(item.unlockedBy.startsWith("reward:")){
+      const idx = item.unlockedBy.split(":")[1];
+      return !!state.rewardsClaimed[idx];
+    }
+    return !!state.achievements[item.unlockedBy];
+  }
+
+  // Titres cosmétiques obtenables uniquement via les coffres (aléatoire)
+  const BADGES = [
+    {id:"perseverant", label:"Persévérant"},
+    {id:"motive", label:"Motivé"},
+    {id:"increvable", label:"Increvable"},
+    {id:"discipline", label:"Discipliné"},
+    {id:"esprit_guerrier", label:"Esprit guerrier"},
+    {id:"legende_locale", label:"Légende locale"}
+  ];
+
+  const ACHIEVEMENTS = [
+    {id:"kilo1", medal:"🥈", label:"Premier sang — Premier kilo perdu", xp:250, auto:false},
+    {id:"streak7", medal:"🔥", label:"Incassable — 7 jours d'affilée", xp:150, auto:true},
+    {id:"month1", medal:"🥉", label:"Premier mois terminé", xp:500, auto:false},
+    {id:"pants", medal:"👖", label:"Premier pantalon devenu trop grand", xp:500, auto:false},
+    {id:"streak30", medal:"🔥", label:"30 jours sans abandon", xp:1000, auto:true},
+    {id:"walker", medal:"👟", label:"Marcheur — 100 000 pas cumulés", xp:500, auto:true},
+    {id:"warrior10", medal:"💪", label:"Guerrier — 10 séances réalisées", xp:500, auto:true},
+    {id:"balance", medal:"🍕", label:"Maître de l'équilibre — Profiter d'un repas plaisir sans culpabiliser", xp:300, auto:true},
+    {id:"bossfinal", medal:"💀", label:"Le Boss final — Atteindre 88 kg", xp:2000, auto:true},
+    {id:"papaenforme", medal:"👨‍👧", label:"Papa en forme — Objectif final atteint", xp:5000, auto:true}
+  ];
+
+  const CHALLENGES = [
+    "Pas d'ascenseur pendant 7 jours",
+    "Boire uniquement de l'eau",
+    "10 000 pas tous les jours",
+    "Manger un légume à chaque repas",
+    "Faire une balade avec Charline",
+    "Préparer un repas maison"
+  ];
+
+  const FINAL_QUEST = [
+    {id:"kg88", label:"Atteindre 88 kg", auto:true},
+    {id:"pompes20", label:"Faire 20 pompes d'affilée", auto:false},
+    {id:"gainage2", label:"Tenir 2 minutes en gainage", auto:false},
+    {id:"courir5", label:"Courir 5 km sans t'arrêter (ou marcher 8 km)", auto:false},
+    {id:"vetements", label:"Te sentir bien dans tes vêtements", auto:false}
+  ];
+
+  // ---------- state ----------
+  function todayKey(d){
+    d = d || new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function isoWeekKey(d){
+    d = d || new Date();
+    const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = (dt.getUTCDay() + 6) % 7;
+    dt.setUTCDate(dt.getUTCDate() - dayNum + 3);
+    const firstThursday = new Date(Date.UTC(dt.getUTCFullYear(),0,4));
+    const week = 1 + Math.round(((dt - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay()+6)%7)) / 7);
+    return dt.getUTCFullYear() + "-W" + String(week).padStart(2,"0");
+  }
+
+  function defaultState(){
+    return {
+      weight: 96,
+      xpTotal: 0,
+      currentDate: todayKey(),
+      dailyChecksByDate: {},
+      streak: 0,
+      bestStreak: 0,
+      stepsTotal: 0,
+      seanceCount: 0,
+      classes: {},
+      achievements: {},
+      bossWeekKey: null,
+      weeklyChallenge: {weekKey:null, text:null, completed:false},
+      finalQuest: {},
+      weightHistory: [],
+      rewardsClaimed: {},
+      dailyEvent: null,
+      goalWeight: 88,
+      equipment: {outfit:"outfit_basic", shoes:"shoes_old", cap:null, glasses:null, weapon:null, armor:null, crown:null},
+      coins: 0,
+      chests: [],
+      badgesUnlocked: {},
+      purchasedItems: {},
+      jokers: 1,
+      protectedDates: {},
+      comboMilestonesReached: {},
+      jokerRecoveryDismissed: {},
+      dayBonusClaimed: {},
+      forgeBonusActive: false,
+      weeklyNotes: {},
+      mapZonesRevealed: {0: true}
+    };
+  }
+
+  let state = defaultState();
+
+  function getTodayChecks(){
+    if(!state.dailyChecksByDate[state.currentDate]){ state.dailyChecksByDate[state.currentDate] = {}; }
+    return state.dailyChecksByDate[state.currentDate];
+  }
+
+  async function saveState(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }catch(e){ console.error("save failed", e); }
+    }, 150);
+  }
+
+  async function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        state = Object.assign(defaultState(), parsed);
+        // migration : ancien format "dailyChecks" (un seul jour) -> dailyChecksByDate
+        if(parsed.dailyChecks && !state.dailyChecksByDate[parsed.currentDate]){
+          state.dailyChecksByDate[parsed.currentDate] = parsed.dailyChecks;
+        }
+        delete state.dailyChecks;
+      }
+    }catch(e){ /* no saved state yet */ }
+    if(!state.weightHistory || state.weightHistory.length === 0){
+      state.weightHistory = [{date: state.currentDate, weight: state.weight}];
+    }
+    state.stepsTotal = computeStepsTotal();
+    rolloverDayIfNeeded();
+  }
+
+  function rolloverDayIfNeeded(){
+    const tk = todayKey();
+    if(state.currentDate !== tk){
+      state.currentDate = tk;
+    }
+    computeStreakAndBest();
+    rollDailyEvent();
+    checkComboMilestones();
+  }
+
+  // Un jour compte comme "complet" soit parce que toutes les quêtes ont été
+  // cochées, soit parce qu'un joker de résilience l'a protégé.
+  function isDayFull(dateKey){
+    if(state.protectedDates[dateKey]) return true;
+    const dateObj = new Date(dateKey + "T12:00:00");
+    const quests = getActiveDailyQuests(dateObj);
+    const checks = state.dailyChecksByDate[dateKey] || {};
+    return quests.length > 0 && quests.every(q => checks[q.id]);
+  }
+
+  // Tire (une fois par jour) un événement aléatoire : marchand ambulant, invasion
+  // de boss, ou événement du sage si toutes les quêtes d'hier ont été complétées.
+  function rollDailyEvent(){
+    if(state.dailyEvent && state.dailyEvent.date === state.currentDate) return;
+
+    const yesterday = new Date(state.currentDate + "T12:00:00");
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayFull = isDayFull(todayKey(yesterday));
+
+    let type = null;
+    if(yesterdayFull){
+      type = "sage";
+    } else {
+      const roll = Math.random();
+      if(roll < 0.18) type = "marchand";
+      else if(roll < 0.32) type = "boss";
+    }
+    state.dailyEvent = {date: state.currentDate, type, claimed:false, bonusApplied:false, bonusQuestId:null, bonusAmount:0};
+  }
+
+  // Recalcule la série en cours et la meilleure série à partir de l'historique complet
+  // des jours (et non d'un simple compteur incrémental), pour gérer correctement
+  // les jours sautés (ex: si l'appli n'est pas ouverte pendant 2 jours).
+  function computeStreakAndBest(){
+    const allDates = new Set([
+      ...Object.keys(state.dailyChecksByDate),
+      ...Object.keys(state.protectedDates)
+    ]);
+    const fullDays = new Set();
+    allDates.forEach(d=>{
+      if(d === state.currentDate) return; // le jour en cours ne compte pas encore
+      if(isDayFull(d)) fullDays.add(d);
+    });
+
+    // série en cours : on remonte jour par jour depuis hier tant que c'est complet
+    let streak = 0;
+    const cursor = new Date(state.currentDate + "T12:00:00");
+    cursor.setDate(cursor.getDate() - 1);
+    while(fullDays.has(todayKey(cursor))){
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    if(streak === 0){ state.comboMilestonesReached = {}; }
+    state.streak = streak;
+
+    // meilleure série historique : plus longue suite de jours consécutifs complets
+    const sorted = Array.from(fullDays).sort();
+    let best = 0, run = 0, prevDate = null;
+    sorted.forEach(d=>{
+      if(prevDate){
+        const diffDays = Math.round((new Date(d+"T12:00:00") - new Date(prevDate+"T12:00:00")) / 86400000);
+        run = diffDays === 1 ? run + 1 : 1;
+      } else {
+        run = 1;
+      }
+      best = Math.max(best, run);
+      prevDate = d;
+    });
+    state.bestStreak = Math.max(state.bestStreak || 0, best, streak);
+  }
+
+  // ---------- combo ----------
+  const COMBO_LEVELS = [2, 3, 7, 14, 30];
+  const COMBO_BONUS = {2:15, 3:25, 7:0, 14:60, 30:0}; // 7 et 30 déjà récompensés via les succès
+  const COMBO_JOKER_AWARD = {7:1, 30:1};
+  function checkComboMilestones(){
+    COMBO_LEVELS.forEach(n=>{
+      if(state.streak >= n && !state.comboMilestonesReached[n]){
+        state.comboMilestonesReached[n] = true;
+        const bonus = COMBO_BONUS[n] || 0;
+        if(bonus > 0) addXP(bonus);
+        if(COMBO_JOKER_AWARD[n]){
+          state.jokers = (state.jokers || 0) + COMBO_JOKER_AWARD[n];
+        }
+        const lines = ["Tu tiens ton objectif depuis " + n + " jours !"];
+        if(bonus > 0) lines.push("+" + bonus + " XP bonus");
+        if(COMBO_JOKER_AWARD[n]) lines.push("🃏 +1 Joker de résilience");
+        showLevelUp(lines, {title: "🔥 COMBO ×" + n + " !", banner: "🔥🔥🔥🔥🔥"});
+        saveState();
+      }
+    });
+  }
+
+  // ---------- level up overlay ----------
+  let levelupTimer = null;
+  function showLevelUp(lines, opts){
+    opts = opts || {};
+    const ov = document.getElementById("levelup-overlay");
+    document.getElementById("levelup-title").textContent = opts.title || "NIVEAU SUPÉRIEUR !";
+    const banner = opts.banner || "⚔️⚔️⚔️⚔️⚔️";
+    document.getElementById("levelup-banner-top").textContent = banner;
+    document.getElementById("levelup-banner-bottom").textContent = banner;
+    document.getElementById("levelup-sub").innerHTML = lines.join("<br>");
+    ov.classList.add("show");
+    clearTimeout(levelupTimer);
+    levelupTimer = setTimeout(()=> ov.classList.remove("show"), 3200);
+  }
+  document.getElementById("levelup-overlay").addEventListener("click", ()=>{
+    document.getElementById("levelup-overlay").classList.remove("show");
+    clearTimeout(levelupTimer);
+  });
+  let toastTimer = null;
+  function showToast(msg){
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove("show"), 1800);
+  }
+
+  function addXP(amount){
+    const prevXPLevel = getXPLevel(state.xpTotal);
+    state.xpTotal = Math.max(0, state.xpTotal + amount);
+    const newXPLevel = getXPLevel(state.xpTotal);
+    checkAutoAchievements();
+    saveState();
+    if(amount > 0 && newXPLevel.level > prevXPLevel.level){
+      showLevelUp(["NIVEAU " + newXPLevel.level, newXPLevel.title.toUpperCase()]);
+    }
+  }
+
+  function checkAutoAchievements(){
+    ACHIEVEMENTS.forEach(a=>{
+      if(!a.auto || state.achievements[a.id]) return;
+      if(a.id === "streak7" && state.streak >= 7) claimAchievement(a);
+      if(a.id === "streak30" && state.streak >= 30) claimAchievement(a);
+      if(a.id === "walker" && state.stepsTotal >= 100000) claimAchievement(a);
+      if(a.id === "warrior10" && state.seanceCount >= 10) claimAchievement(a);
+      if(a.id === "bossfinal" && state.weight <= state.goalWeight) claimAchievement(a);
+    });
+  }
+
+  function claimAchievement(a){
+    if(state.achievements[a.id]) return;
+    state.achievements[a.id] = true;
+    state.xpTotal += a.xp;
+    showToast("🏅 SUCCÈS : " + a.label + " (+" + a.xp + " XP)");
+    awardChest("Coffre du Succès");
+    saveState();
+    renderAll();
+  }
+
+  // ---------- coffres & récompenses aléatoires ----------
+  let chestCounter = 0;
+  function awardChest(label){
+    chestCounter++;
+    state.chests.push({id: state.currentDate + "-" + chestCounter + "-" + Math.floor(Math.random()*10000), label, opened:false});
+    saveState();
+  }
+
+  function openChest(chestId){
+    const idx = state.chests.findIndex(c => c.id === chestId);
+    if(idx === -1) return;
+    const chest = state.chests[idx];
+    const coinsWon = 30 + Math.floor(Math.random() * 51); // 30-80
+    const xpWon = 40 + Math.floor(Math.random() * 81); // 40-120
+    let badgeWon = null;
+    const lockedBadges = BADGES.filter(b => !state.badgesUnlocked[b.id]);
+    if(lockedBadges.length > 0 && Math.random() < 0.35){
+      badgeWon = lockedBadges[Math.floor(Math.random() * lockedBadges.length)];
+      state.badgesUnlocked[badgeWon.id] = true;
+    }
+    state.coins += coinsWon;
+    state.chests.splice(idx, 1);
+    addXP(xpWon);
+    saveState();
+    renderAll();
+    const lines = ["🪙 +" + coinsWon + " pièces", "⚡ +" + xpWon + " XP"];
+    if(badgeWon) lines.push("🏵️ Titre débloqué : " + badgeWon.label);
+    showLevelUp(lines, {title: "🎉 " + chest.label, banner: "✨✨✨✨✨"});
+  }
+
+  function getLevelInfo(weight){
+    const levels = getLevels();
+    let reached = levels[0];
+    for(const lv of levels){ if(weight <= lv.kg){ reached = lv; } }
+    return reached;
+  }
+
+  // ---------- système XP à paliers (niveaux RPG) ----------
+  const XP_LEVELS = [
+    {level:1, title:"Recrue", required:0},
+    {level:2, title:"Aventurier", required:100},
+    {level:3, title:"Guerrier", required:250},
+    {level:4, title:"Champion", required:450},
+    {level:5, title:"Héros", required:700},
+    {level:6, title:"Légende", required:1000},
+    {level:7, title:"Mythique", required:1500}
+  ];
+  function getXPLevel(xp){
+    let current = XP_LEVELS[0];
+    for(const l of XP_LEVELS){ if(xp >= l.required){ current = l; } }
+    return current;
+  }
+  function getXPProgress(xp){
+    const cur = getXPLevel(xp);
+    const idx = XP_LEVELS.indexOf(cur);
+    const next = XP_LEVELS[idx+1];
+    if(!next){ return {cur, next:null, pct:100, into: xp - cur.required, span:0}; }
+    const span = next.required - cur.required;
+    const into = xp - cur.required;
+    return {cur, next, pct: Math.max(0, Math.min(100, Math.round(into/span*100))), into, span};
+  }
+
+  // ---------- rendering ----------
+  function renderHUD(){
+    const weightLvl = getLevelInfo(state.weight);
+    const prog = getXPProgress(state.xpTotal);
+    document.getElementById("hud-level").textContent = prog.cur.level;
+    document.getElementById("hud-weight").textContent = state.weight + " kg";
+    document.getElementById("hud-xp").textContent = state.xpTotal;
+    document.getElementById("xpbar-inner").style.width = prog.pct + "%";
+    document.getElementById("xplabel").textContent = prog.cur.title.toUpperCase() +
+      (prog.next ? " — " + prog.into + " / " + prog.span + " XP vers " + prog.next.title : " — NIVEAU MAX");
+    document.getElementById("input-weight").value = state.weight;
+    document.getElementById("input-goal").value = state.goalWeight;
+  }
+
+  function renderLevelPath(){
+    const wrap = document.getElementById("levelpath");
+    wrap.innerHTML = "";
+    const levels = getLevels();
+    // determine current: first level (in order 1..MAX) not yet reached
+    let currentIdx = levels.findIndex(lv => state.weight > lv.kg);
+    if(currentIdx === -1) currentIdx = levels.length; // all reached
+    levels.forEach((lv, idx)=>{
+      const reached = state.weight <= lv.kg;
+      const isCurrent = idx === currentIdx;
+      const div = document.createElement("div");
+      div.className = "levelnode" + (reached ? " done" : (isCurrent ? " current" : ""));
+      const badgeIcon = reached ? "✅" : (isCurrent ? "👉" : "🔒");
+      let tag = reached ? '<span class="tag done">FAIT</span>' : (isCurrent ? '<span class="tag now">EN COURS</span>' : '<span class="tag locked">VERROUILLÉ</span>');
+      div.innerHTML = `
+        <div class="node-badge">${badgeIcon}</div>
+        <div class="node-body">
+          <b>Niveau ${lv.n}${tag}</b><br>
+          <span class="kg">${lv.kg} kg</span>
+          <div class="rew">${lv.reward}</div>
+        </div>`;
+      wrap.appendChild(div);
+    });
+  }
+
+  // Applique la complétion d'une quête (XP, pièces, compteurs, bonus du Sage, succès)
+  function completeQuest(q){
+    const checks = getTodayChecks();
+    if(checks[q.id]) return;
+    checks[q.id] = true;
+    addXP(q.xp);
+    if(q.coins){ state.coins += q.coins; }
+    if(q.type === "seance"){ state.seanceCount += 1; }
+    const dow = new Date().getDay();
+    if(state.forgeBonusActive && (dow === 6 || dow === 0)){
+      addXP(q.xp); // double l'XP de cette quête (bonus de la Forge du vendredi)
+      state.forgeBonusActive = false;
+      showToast("🔥 Bonus de la Forge appliqué : XP doublé sur cette quête !");
+    }
+    if(state.dailyEvent && state.dailyEvent.type === "sage" && !state.dailyEvent.bonusApplied){
+      const bonus = Math.round(q.xp * 0.5);
+      addXP(bonus);
+      state.dailyEvent.bonusApplied = true;
+      state.dailyEvent.bonusQuestId = q.id;
+      state.dailyEvent.bonusAmount = bonus;
+      showToast("🧙 Bonus du Sage : +" + bonus + " XP !");
+    }
+    checkAutoAchievements();
+    checkMapZones();
+  }
+
+  // Additionne les vrais pas saisis chaque jour depuis le début (et non un palier fixe
+  // par quête validée), pour que la carte reflète fidèlement l'effort réel.
+  function computeStepsTotal(){
+    let total = 0;
+    Object.keys(state.dailyChecksByDate).forEach(dateKey=>{
+      const dateObj = new Date(dateKey + "T12:00:00");
+      const dayDef = DAY_QUESTS[dateObj.getDay()];
+      if(!dayDef) return;
+      const stepsQuest = dayDef.main.find(q => q.type === "steps");
+      if(!stepsQuest) return;
+      total += state.dailyChecksByDate[dateKey][stepsQuest.id + "__progress"] || 0;
+    });
+    return total;
+  }
+
+  // Point d'entrée unique pour enregistrer les pas du jour (utilisé par la carte ET
+  // par la quête "pas" du jour), afin que les deux restent toujours synchronisés.
+  function recordDailySteps(rawValue){
+    const now = new Date();
+    const stepsQuest = DAY_QUESTS[now.getDay()].main.find(q => q.type === "steps");
+    if(!stepsQuest) return null;
+    let val = parseInt(rawValue) || 0;
+    if(val < 0) val = 0;
+    const checks = getTodayChecks();
+    checks[stepsQuest.id + "__progress"] = val;
+    const wasChecked = !!checks[stepsQuest.id];
+    if(val >= stepsQuest.amount && !wasChecked){
+      completeQuest(stepsQuest);
+    } else if(val < stepsQuest.amount && wasChecked){
+      uncompleteQuest(stepsQuest);
+    }
+    state.stepsTotal = computeStepsTotal();
+    checkMapZones();
+    checkDayBonuses();
+    saveState();
+    return val;
+  }
+
+  // Révèle les nouvelles zones de la carte selon les pas cumulés, une seule fois chacune
+  function checkMapZones(){
+    const totalSteps = state.stepsTotal || 0;
+    MAP_ZONES.forEach((zone, idx)=>{
+      if(totalSteps >= zone.threshold && !state.mapZonesRevealed[idx]){
+        state.mapZonesRevealed[idx] = true;
+        const coinsWon = 15 + idx * 5;
+        state.coins += coinsWon;
+        showLevelUp(
+          ["🎉 NOUVELLE ZONE DÉCOUVERTE", zone.icon + " " + zone.name, "+" + coinsWon + " 🪙"],
+          {title: "🗺️ EXPLORATION", banner: "🌫️🌫️🌫️🌫️🌫️"}
+        );
+        saveState();
+      }
+    });
+  }
+
+  // Annule la complétion d'une quête (symétrique de completeQuest)
+  function uncompleteQuest(q){
+    const checks = getTodayChecks();
+    if(!checks[q.id]) return;
+    delete checks[q.id];
+    addXP(-q.xp);
+    if(q.coins){ state.coins = Math.max(0, state.coins - q.coins); }
+    if(q.type === "seance"){ state.seanceCount = Math.max(0, state.seanceCount - 1); }
+    if(state.dailyEvent && state.dailyEvent.bonusQuestId === q.id){
+      addXP(-state.dailyEvent.bonusAmount);
+      state.dailyEvent.bonusApplied = false;
+      state.dailyEvent.bonusQuestId = null;
+      state.dailyEvent.bonusAmount = 0;
+    }
+  }
+
+  // Vérifie les bonus spécifiques à chaque jour de la semaine, une seule fois par jour
+  function checkDayBonuses(){
+    const now = new Date();
+    const dow = now.getDay();
+    const dateKey = state.currentDate;
+    const mainQuests = getActiveDailyQuests(now);
+    const secQuests = getSecondaryQuests(now);
+    const checks = getTodayChecks();
+    const mainAllDone = mainQuests.every(q => checks[q.id]);
+    const secAllDone = secQuests.every(q => checks[q.id]);
+
+    if(dow === 2 && secAllDone && !state.dayBonusClaimed[dateKey + "_tue"]){
+      state.dayBonusClaimed[dateKey + "_tue"] = true;
+      state.coins += 10;
+      showToast("🎁 Bonus du mardi : +10 🪙 (3 quêtes secondaires terminées) !");
+    }
+    if(dow === 4 && mainAllDone && !state.badgesUnlocked["guerrier_du_jeudi"]){
+      state.badgesUnlocked["guerrier_du_jeudi"] = true;
+      showToast("🛡️ Badge débloqué : Guerrier du jeudi !");
+    }
+    if(dow === 5 && mainAllDone && secAllDone && !state.dayBonusClaimed[dateKey + "_forge"]){
+      state.dayBonusClaimed[dateKey + "_forge"] = true;
+      state.forgeBonusActive = true;
+      showToast("🔥 COMBO DE LA FORGE ! Ta prochaine quête du week-end rapportera XP ×2");
+    }
+    if(dow === 6 && mainAllDone && !state.dayBonusClaimed[dateKey + "_sat"]){
+      state.dayBonusClaimed[dateKey + "_sat"] = true;
+      state.coins += 20;
+      showToast("🏕️ Expédition réussie : +20 🪙 bonus !");
+    }
+    if(dow === 0 && mainAllDone && !state.dayBonusClaimed[dateKey + "_sun"]){
+      state.dayBonusClaimed[dateKey + "_sun"] = true;
+      awardChest("Coffre Hebdomadaire");
+      showToast("👑 Conseil du Royaume terminé : un Coffre Hebdomadaire t'attend !");
+    }
+    saveState();
+  }
+
+  function renderQuestGroup(containerId, list){
+    const el = document.getElementById(containerId);
+    el.innerHTML = "";
+    const todayChecks = getTodayChecks();
+
+    list.forEach(q=>{
+      const checked = !!todayChecks[q.id];
+      const rewardText = "🎁 Récompense : +" + q.xp + " XP" + (q.coins ? (" + " + q.coins + " 🪙") : "");
+      const row = document.createElement("div");
+      row.className = "questcard" + (checked ? " done" : "");
+
+      if(q.type === "steps"){
+        const progress = todayChecks[q.id + "__progress"] || 0;
+        const pct = Math.min(100, Math.round(progress / q.amount * 100));
+        row.innerHTML = `
+          <div class="qc-header">
+            <span class="qc-icon">${q.qicon}</span>
+            <div class="qc-titles"><b>${q.qtitle}</b><span>${q.label}</span></div>
+            <div class="qc-checkbox">${checked ? "✔" : ""}</div>
+          </div>
+          <div class="qc-progress-row">
+            <input type="number" class="qc-input" inputmode="numeric" min="0" value="${progress}">
+            <span class="qc-target">/ ${q.amount} pas</span>
+          </div>
+          <div class="qc-bar-outer"><div class="qc-bar-inner" style="width:${pct}%"></div></div>
+          <div class="qc-reward">${rewardText}</div>`;
+
+        const inputEl = row.querySelector(".qc-input");
+        const barEl = row.querySelector(".qc-bar-inner");
+        inputEl.addEventListener("click", (e)=> e.stopPropagation());
+        inputEl.addEventListener("input", ()=>{
+          let val = parseInt(inputEl.value) || 0;
+          if(val < 0) val = 0;
+          barEl.style.width = Math.min(100, Math.round(val / q.amount * 100)) + "%";
+        });
+        inputEl.addEventListener("change", ()=>{
+          const checks = getTodayChecks();
+          const wasChecked = !!checks[q.id];
+          const val = recordDailySteps(inputEl.value);
+          inputEl.value = val;
+          if(val >= q.amount && !wasChecked){
+            showToast("⚔️ Quête accomplie : " + q.qtitle + " !");
+          }
+          renderAll();
+        });
+      } else {
+        row.innerHTML = `
+          <div class="qc-header">
+            <span class="qc-icon">${q.qicon}</span>
+            <div class="qc-titles"><b>${q.qtitle}</b><span>${q.label}</span></div>
+            <div class="qc-checkbox">${checked ? "✔" : ""}</div>
+          </div>
+          <div class="qc-reward">${rewardText}</div>`;
+        row.addEventListener("click", ()=>{
+          const checks = getTodayChecks();
+          if(checks[q.id]){ uncompleteQuest(q); } else { completeQuest(q); }
+          checkDayBonuses();
+          saveState();
+          renderAll();
+        });
+      }
+      el.appendChild(row);
+    });
+  }
+
+  function renderQuetes(){
+    const now = new Date();
+    document.getElementById("today-date").textContent = "📅 " + now.toLocaleDateString("fr-FR", {weekday:"long", day:"numeric", month:"long"});
+    const day = DAY_QUESTS[now.getDay()];
+    document.getElementById("q-theme-title").textContent = day.icon + " " + day.title;
+    renderQuestGroup("q-main", day.main);
+    document.getElementById("streak-count").textContent = state.streak || 0;
+    renderCombo();
+    renderJokers();
+    renderSecondaryQuests();
+
+    const wk = isoWeekKey();
+    const bossDone = state.bossWeekKey === wk;
+    const isSaturday = new Date().getDay() === 6;
+    const bossBtn = document.getElementById("btn-boss-week");
+    if(!isSaturday){
+      bossBtn.textContent = "👹 Le Boss apparaîtra samedi";
+      bossBtn.classList.add("disabled");
+    } else {
+      bossBtn.textContent = bossDone ? "✔️ Déjà validé cette semaine" : "⚔️ Victoire (+100 XP)";
+      bossBtn.classList.toggle("disabled", bossDone);
+    }
+
+    const ch = state.weeklyChallenge;
+    const drawBtn = document.getElementById("btn-draw-challenge");
+    const doneBtn = document.getElementById("btn-complete-challenge");
+    if(ch.weekKey === wk && ch.text){
+      document.getElementById("challenge-text").textContent = "🎲 " + ch.text;
+      drawBtn.style.display = "none";
+      doneBtn.style.display = ch.completed ? "none" : "inline-block";
+      if(ch.completed){ document.getElementById("challenge-text").textContent = "✅ " + ch.text + " — Relevé !"; }
+    } else {
+      document.getElementById("challenge-text").textContent = "Aucun défi tiré cette semaine.";
+      drawBtn.style.display = "inline-block";
+      doneBtn.style.display = "none";
+    }
+
+    renderEvent();
+    renderChests();
+  }
+
+  function renderSecondaryQuests(){
+    const now = new Date();
+    const wk = isoWeekKey();
+    const secQuests = getSecondaryQuests(now);
+    const todayChecks = getTodayChecks();
+    if(!state.weeklyNotes[wk]) state.weeklyNotes[wk] = {};
+
+    const list = document.getElementById("sidequests-list");
+    list.innerHTML = "";
+
+    secQuests.forEach(q=>{
+      const checked = !!todayChecks[q.id];
+      const row = document.createElement("div");
+      row.className = "squest" + (checked ? " done" : "");
+      const rewardText = "+" + q.xp + " XP" + (q.coins ? (" + " + q.coins + " 🪙") : "");
+      row.innerHTML = `
+        <div class="checkbox">${checked ? "✔" : ""}</div>
+        <div class="sinfo">
+          <b>${q.qicon} ${q.qtitle}</b>
+          <span>${q.label} — 🎁 ${rewardText}</span>
+        </div>`;
+      row.addEventListener("click", ()=>{
+        const checks = getTodayChecks();
+        if(checks[q.id]){ uncompleteQuest(q); } else { completeQuest(q); }
+        checkDayBonuses();
+        saveState();
+        renderAll();
+      });
+      list.appendChild(row);
+
+      if(q.note){
+        const noteWrap = document.createElement("div");
+        noteWrap.style.margin = "0 0 12px 30px";
+        const savedNote = state.weeklyNotes[wk][q.id] || "";
+        noteWrap.innerHTML = `<input type="text" class="qc-input" style="width:100%; text-align:left;" placeholder="Ta réponse (optionnel)" value="${savedNote}">`;
+        const noteInput = noteWrap.querySelector("input");
+        noteInput.addEventListener("change", ()=>{
+          state.weeklyNotes[wk][q.id] = noteInput.value;
+          saveState();
+        });
+        list.appendChild(noteWrap);
+      }
+    });
+  }
+
+  function renderCombo(){
+    const streak = state.streak || 0;
+    document.getElementById("combo-count").textContent = "×" + streak;
+    document.getElementById("combo-flame").classList.toggle("hot", streak >= 7);
+    document.getElementById("best-streak").textContent = state.bestStreak || 0;
+
+    const todayChecks = getTodayChecks();
+    const todayQuests = getActiveDailyQuests(new Date());
+    const todayFull = todayQuests.length > 0 && todayQuests.every(q => todayChecks[q.id]);
+    document.getElementById("combo-danger").style.display = (streak > 0 && !todayFull) ? "block" : "none";
+  }
+
+  function renderJokers(){
+    document.getElementById("joker-count").textContent = state.jokers || 0;
+
+    const todayChecks = getTodayChecks();
+    const todayQuests = getActiveDailyQuests(new Date());
+    const todayFull = todayQuests.length > 0 && todayQuests.every(q => todayChecks[q.id]);
+    const alreadyProtected = !!state.protectedDates[state.currentDate];
+    const protectBtn = document.getElementById("btn-protect-today");
+    protectBtn.style.display = (state.jokers > 0 && !todayFull && !alreadyProtected) ? "inline-block" : "none";
+
+    const yesterday = new Date(state.currentDate + "T12:00:00");
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yKey = todayKey(yesterday);
+    const canRecover = state.streak === 0 && state.jokers > 0 && !isDayFull(yKey) && !state.jokerRecoveryDismissed[yKey];
+    const recoveryBox = document.getElementById("joker-recovery");
+    if(canRecover){
+      recoveryBox.style.display = "block";
+      const yDate = yesterday.toLocaleDateString("fr-FR", {weekday:"long", day:"numeric", month:"long"});
+      document.getElementById("joker-recovery-text").textContent = "Tu as raté tes quêtes du " + yDate + ". Utilise un joker pour restaurer ton combo ?";
+      recoveryBox.dataset.yKey = yKey;
+    } else {
+      recoveryBox.style.display = "none";
+    }
+  }
+
+  function renderChests(){
+    const panel = document.getElementById("chests-panel");
+    const list = document.getElementById("chests-list");
+    if(!state.chests || state.chests.length === 0){
+      panel.style.display = "none";
+      return;
+    }
+    panel.style.display = "block";
+    list.innerHTML = "";
+    state.chests.forEach(chest=>{
+      const row = document.createElement("div");
+      row.className = "chest-row";
+      row.innerHTML = `<div class="cicon">🔒</div><div class="cinfo">${chest.label}</div><div class="btn small green" data-chest="${chest.id}">Ouvrir</div>`;
+      list.appendChild(row);
+    });
+    list.querySelectorAll("[data-chest]").forEach(btn=>{
+      btn.addEventListener("click", ()=> openChest(btn.dataset.chest));
+    });
+  }
+
+  function renderEvent(){
+    const panel = document.getElementById("event-panel");
+    const box = document.getElementById("eventbox");
+    const ev = state.dailyEvent;
+
+    if(!ev || !ev.type){
+      panel.style.display = "none";
+      return;
+    }
+    panel.style.display = "block";
+
+    if(ev.type === "marchand"){
+      box.innerHTML = `
+        <h4>🛒 LE MARCHAND AMBULANT</h4>
+        <p>Il est passé par là et te laisse une petite récompense pour ta régularité.</p>
+        <div class="btn-row" style="justify-content:center;">
+          <div class="btn green small" id="btn-event-claim">${ev.claimed ? "✅ Récupéré" : "🎁 Récupérer (+20 XP)"}</div>
+        </div>`;
+      const btn = document.getElementById("btn-event-claim");
+      if(ev.claimed){ btn.classList.add("disabled"); }
+      btn.addEventListener("click", ()=>{
+        if(state.dailyEvent.claimed) return;
+        state.dailyEvent.claimed = true;
+        addXP(20);
+        showToast("🛒 Cadeau du marchand : +20 XP");
+        renderAll();
+      });
+    } else if(ev.type === "boss"){
+      box.innerHTML = `
+        <h4>👹 INVASION DU BOSS</h4>
+        <p>Une quête bonus apparaît aujourd'hui : 12 000 pas supplémentaires.</p>
+        <div class="quest ${ev.claimed ? "checked" : ""}" id="event-boss-quest">
+          <div class="checkbox">${ev.claimed ? "✔" : ""}</div>
+          <div class="label">12 000 pas supplémentaires</div>
+          <div class="xp-pill">+75 XP</div>
+        </div>`;
+      document.getElementById("event-boss-quest").addEventListener("click", ()=>{
+        if(state.dailyEvent.claimed){
+          state.dailyEvent.claimed = false;
+          addXP(-75);
+        } else {
+          state.dailyEvent.claimed = true;
+          addXP(75);
+        }
+        saveState();
+        renderAll();
+      });
+    } else if(ev.type === "sage"){
+      box.innerHTML = `
+        <h4>🧙 ÉVÉNEMENT DU SAGE</h4>
+        <p>Tu as terminé toutes tes quêtes hier ! ${ev.bonusApplied ? ("Bonus déjà appliqué : +" + ev.bonusAmount + " XP.") : "Ta première quête cochée aujourd'hui rapporte +50% XP."}</p>`;
+    }
+  }
+
+  // ---------- personnage pixel-art (canvas 128x168, grille 32x42, blocs de 4px) ----------
+  function bChar(ctx, gx, gy, gw, gh, color){
+    ctx.fillStyle = color;
+    ctx.fillRect(gx * 4, gy * 4, gw * 4, gh * 4);
+  }
+
+  function drawCharacter(visual, equipment){
+    const canvas = document.getElementById("avatar-canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if(visual.bg === "glow"){
+      ctx.fillStyle = "rgba(241,201,72,0.28)";
+      ctx.beginPath(); ctx.ellipse(64, 84, 56, 62, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    if(visual.bg === "cape"){
+      bChar(ctx,6,18,4,20,"#a13d2b");
+      bChar(ctx,22,18,4,20,"#a13d2b");
+    }
+
+    let armLX=0, armLY=0, armRX=0, armRY=0, legLX=0, legRX=0;
+    if(visual.pose === "walk"){ armRY=-2; legLX=-1; legRX=1; }
+    if(visual.pose === "jog"){ armRY=-3; armLY=2; legLX=-2; legRX=2; }
+    if(visual.pose === "hero" || visual.pose === "boss"){ armLX=-1; armRX=1; }
+
+    let shirt = visual.shirt, shoe = visual.shoe, pants = visual.pants;
+    if(equipment.outfit === "outfit_gold") shirt = "#f1c948";
+    else if(equipment.outfit === "outfit_tshirt") shirt = "#e8dcc0";
+    if(equipment.shoes === "shoes_new") shoe = "#f5f5f5";
+
+    // cheveux (arrière) + tête + frange
+    bChar(ctx,9,4,14,6,HAIR_COLOR);
+    bChar(ctx,11,6,10,9,SKIN_COLOR);
+    bChar(ctx,10,5,12,2,HAIR_COLOR);
+    bChar(ctx,14,10,1,1,"#2a1a10"); bChar(ctx,18,10,1,1,"#2a1a10");
+    bChar(ctx,14,15,4,2,SKIN_COLOR);
+
+    const armW = visual.pose === "flex" ? 5 : 4;
+    bChar(ctx,5+armLX,17+armLY,armW,6,shirt);
+    bChar(ctx,5+armLX,23+armLY,armW,4,SKIN_COLOR);
+    bChar(ctx,23-(armW-4)+armRX,17+armRY,armW,6,shirt);
+    bChar(ctx,23-(armW-4)+armRX,23+armRY,armW,4,SKIN_COLOR);
+
+    bChar(ctx,9,17,14,12,shirt);
+    if(equipment.armor){ bChar(ctx,11,19,10,8,"rgba(130,130,130,0.85)"); }
+
+    bChar(ctx,11+legLX,29,5,10,pants);
+    bChar(ctx,16+legRX,29,5,10,pants);
+    bChar(ctx,10+legLX,39,7,3,shoe);
+    bChar(ctx,15+legRX,39,7,3,shoe);
+
+    if(equipment.crown){
+      bChar(ctx,10,1,12,2,"#f1c948");
+      bChar(ctx,13,0,2,1,"#f1c948"); bChar(ctx,17,0,2,1,"#f1c948"); bChar(ctx,15,0,2,1,"#f1c948");
+    } else if(equipment.cap){
+      bChar(ctx,9,4,14,3,"#3d6b6b"); bChar(ctx,9,7,7,1,"#2a4a4a");
+    }
+    if(equipment.glasses){ bChar(ctx,13,10,9,2,"#1a1a1a"); }
+    if(equipment.weapon){ bChar(ctx,27,10,2,16,"#8a8a8a"); bChar(ctx,25,10,6,2,"#c9a869"); }
+  }
+
+  function renderAvatar(){
+    const levels = getLevels();
+    const li = getLevelInfo(state.weight);
+    let stageIdx = levels.findIndex(lv => lv.n === li.n);
+    if(stageIdx === -1) stageIdx = 0;
+    const isBoss = !!state.achievements["papaenforme"];
+    const stage = isBoss ? AVATAR_BOSS_STAGE : AVATAR_STAGES[stageIdx];
+    const visual = isBoss ? BOSS_VISUAL : STAGE_VISUALS[stageIdx];
+
+    drawCharacter(visual, state.equipment);
+    document.getElementById("avatar-title").textContent = stage.title;
+    document.getElementById("coin-balance").textContent = state.coins;
+
+    const slotsEl = document.getElementById("avatar-slots");
+    slotsEl.innerHTML = "";
+    SLOT_ORDER.forEach(slot=>{
+      const itemId = state.equipment[slot];
+      const item = ITEMS.find(i => i.id === itemId);
+      const box = document.createElement("div");
+      box.className = "avatar-slot" + (item ? "" : " empty");
+      box.textContent = item ? item.emoji : "·";
+      slotsEl.appendChild(box);
+    });
+
+    const listEl = document.getElementById("equipment-list");
+    listEl.innerHTML = "";
+    SLOT_ORDER.forEach(slot=>{
+      const items = ITEMS.filter(i => i.slot === slot);
+      if(items.length === 0) return;
+      const title = document.createElement("div");
+      title.className = "equip-group-title";
+      title.textContent = SLOT_LABELS[slot];
+      listEl.appendChild(title);
+      items.forEach(item=>{
+        const unlocked = isItemUnlocked(item);
+        const equipped = state.equipment[slot] === item.id;
+        const row = document.createElement("div");
+        row.className = "equip-item" + (!unlocked ? " locked" : (equipped ? " equipped" : ""));
+        let rightHtml = "";
+        if(!unlocked && item.coinCost !== undefined){
+          const canAfford = state.coins >= item.coinCost;
+          rightHtml = `<div class="btn small ${canAfford ? "green" : "disabled"}" data-buy="${item.id}">🪙 ${item.coinCost}</div>`;
+        }
+        row.innerHTML = `<div class="eicon">${unlocked ? item.emoji : "🔒"}</div><div class="einfo">${item.label}${equipped ? " — équipé" : ""}</div>${rightHtml}`;
+        if(unlocked){
+          row.addEventListener("click", ()=>{
+            state.equipment[slot] = (state.equipment[slot] === item.id) ? null : item.id;
+            saveState();
+            renderAvatar();
+          });
+        }
+        listEl.appendChild(row);
+      });
+    });
+
+    listEl.querySelectorAll("[data-buy]").forEach(btn=>{
+      btn.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const item = ITEMS.find(i => i.id === btn.dataset.buy);
+        if(!item || state.purchasedItems[item.id]) return;
+        if(state.coins < item.coinCost){
+          showToast("Pas assez de pièces 🪙");
+          return;
+        }
+        state.coins -= item.coinCost;
+        state.purchasedItems[item.id] = true;
+        showToast("🛒 " + item.label + " achetée !");
+        saveState();
+        renderAvatar();
+      });
+    });
+  }
+
+  function renderRewards(){
+    const list = document.getElementById("rewards-list");
+    list.innerHTML = "";
+    getLevels().forEach((lv, idx)=>{
+      const reached = state.weight <= lv.kg;
+      const claimed = !!state.rewardsClaimed[idx];
+      const row = document.createElement("div");
+      row.className = "reward-row" + (!reached ? " locked" : (claimed ? " claimed" : ""));
+      const icon = !reached ? "🔒" : (claimed ? "✅" : "🎁");
+      const btnHtml = !reached
+        ? `<span class="xp-pill">VERROUILLÉ</span>`
+        : (claimed
+          ? `<span class="xp-pill">OBTENUE</span>`
+          : `<div class="btn small green" data-reward="${idx}">Marquer comme obtenue</div>`);
+      row.innerHTML = `<div class="ricon">${icon}</div><div class="rinfo"><b>Niveau ${lv.n} — ${lv.kg} kg</b><span>${lv.reward}</span></div>${btnHtml}`;
+      list.appendChild(row);
+    });
+    list.querySelectorAll("[data-reward]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const idx = btn.dataset.reward;
+        if(state.rewardsClaimed[idx]) return;
+        state.rewardsClaimed[idx] = true;
+        showToast("🎁 Récompense marquée comme obtenue !");
+        saveState();
+        renderGuilde();
+      });
+    });
+  }
+
+  function renderGuilde(){
+    renderAvatar();
+    renderRewards();
+    const grid = document.getElementById("classgrid");
+    grid.innerHTML = "";
+    CLASSES.forEach(c=>{
+      const active = !!state.classes[c.id];
+      const div = document.createElement("div");
+      div.className = "classcard" + (active ? " active" : "");
+      div.innerHTML = `<div class="icon">${c.icon}</div><b>${c.label}</b><p>${c.desc}</p>`;
+      div.addEventListener("click", ()=>{
+        state.classes[c.id] = !state.classes[c.id];
+        showToast(state.classes[c.id] ? ("Classe débloquée : " + c.label) : ("Classe retirée : " + c.label));
+        saveState();
+        renderGuilde();
+      });
+      grid.appendChild(div);
+    });
+
+    const achList = document.getElementById("ach-list");
+    achList.innerHTML = "";
+    ACHIEVEMENTS.forEach(a=>{
+      const claimed = !!state.achievements[a.id];
+      const row = document.createElement("div");
+      row.className = "ach" + (claimed ? " claimed" : "");
+      const label = a.id === "bossfinal" ? ("Le Boss final — Atteindre " + state.goalWeight + " kg") : a.label;
+      const btnHtml = a.auto
+        ? `<span class="xp-pill">${claimed ? "OBTENU" : "AUTO"}</span>`
+        : `<div class="btn small ${claimed ? "disabled" : "green"}" data-ach="${a.id}">${claimed ? "✔️" : "Valider"}</div>`;
+      row.innerHTML = `<div class="medal">${a.medal}</div><div class="info"><b>${label}</b><span>+${a.xp} XP</span></div>${btnHtml}`;
+      achList.appendChild(row);
+    });
+    achList.querySelectorAll("[data-ach]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const a = ACHIEVEMENTS.find(x=>x.id===btn.dataset.ach);
+        if(a) claimAchievement(a, false);
+      });
+    });
+  }
+
+  function renderFinal(){
+    const list = document.getElementById("final-list");
+    list.innerHTML = "";
+    let doneCount = 0;
+    FINAL_QUEST.forEach(f=>{
+      const checked = f.auto ? (state.weight <= state.goalWeight) : !!state.finalQuest[f.id];
+      if(checked) doneCount++;
+      const label = f.id === "kg88" ? ("Atteindre " + state.goalWeight + " kg") : f.label;
+      const row = document.createElement("div");
+      row.className = "quest" + (checked ? " checked" : "");
+      row.innerHTML = `<div class="checkbox">${checked ? "✔" : ""}</div><div class="label">${label}</div>`;
+      if(!f.auto){
+        row.addEventListener("click", ()=>{
+          state.finalQuest[f.id] = !state.finalQuest[f.id];
+          saveState();
+          renderFinal();
+        });
+      }
+      list.appendChild(row);
+    });
+    const pct = Math.round((doneCount / FINAL_QUEST.length) * 100);
+    document.getElementById("final-progress").style.width = pct + "%";
+    if(doneCount === FINAL_QUEST.length){
+      const a = ACHIEVEMENTS.find(x=>x.id==="papaenforme");
+      if(a && !state.achievements[a.id]){ claimAchievement(a); }
+    }
+  }
+
+  const START_WEIGHT = 96;
+
+  function renderDashboard(){
+    const prog = getXPProgress(state.xpTotal);
+    document.getElementById("dash-lvltitle").textContent = "N" + prog.cur.level + " — " + prog.cur.title;
+    document.getElementById("dash-lost").textContent = Math.max(0, +(START_WEIGHT - state.weight).toFixed(1)) + " kg";
+    document.getElementById("dash-streak").textContent = state.streak || 0;
+    const totalAch = ACHIEVEMENTS.length;
+    const doneAch = Object.values(state.achievements).filter(Boolean).length;
+    document.getElementById("dash-achcount").textContent = doneAch + "/" + totalAch;
+
+    const weightPct = Math.max(0, Math.min(100, Math.round((START_WEIGHT - state.weight) / (START_WEIGHT - state.goalWeight) * 100)));
+    document.getElementById("dash-weightbar").style.width = weightPct + "%";
+    document.getElementById("dash-goal-label").textContent = state.goalWeight + " kg";
+
+    const now = new Date();
+    const todayQuests = getActiveDailyQuests(now);
+    const todayChecks = getTodayChecks();
+    const doneToday = todayQuests.filter(q => todayChecks[q.id]).length;
+    const xpToday = todayQuests.filter(q => todayChecks[q.id]).reduce((s,q)=>s+q.xp,0);
+    document.getElementById("dash-todaycount").textContent = doneToday + "/" + todayQuests.length;
+    document.getElementById("dash-todayxp").textContent = "+" + xpToday + " XP";
+    document.getElementById("dash-todaybar").style.width = Math.round(doneToday/todayQuests.length*100) + "%";
+
+    const nextLevel = getLevels().find(lv => state.weight > lv.kg);
+    const nextText = document.getElementById("dash-nexttext");
+    if(nextLevel){
+      const remaining = +(state.weight - nextLevel.kg).toFixed(1);
+      nextText.innerHTML = "⬇️ Atteindre " + nextLevel.kg + " kg<br>Encore " + remaining + " kg<br>Récompense : " + nextLevel.reward;
+    } else {
+      nextText.innerHTML = "🏆 Tu as atteint l'objectif final : " + state.goalWeight + " kg !";
+    }
+  }
+
+  function renderWeightHistory(){
+    const hist = (state.weightHistory || []).slice().sort((a,b)=> a.date.localeCompare(b.date));
+    const points = hist.length ? hist : [{date: state.currentDate, weight: state.weight}];
+    const startW = points[0].weight;
+    const bestW = Math.min(...points.map(p=>p.weight), state.weight);
+
+    document.getElementById("wh-start").textContent = startW + " kg";
+    document.getElementById("wh-lost").textContent = Math.max(0, +(startW - state.weight).toFixed(1)) + " kg";
+    document.getElementById("wh-best").textContent = bestW + " kg";
+    document.getElementById("wh-remaining").textContent = Math.max(0, +(state.weight - state.goalWeight).toFixed(1)) + " kg";
+    document.getElementById("wh-goal-label").textContent = state.goalWeight + " kg";
+
+    // ---- graphique SVG pixel-art ----
+    const svg = document.getElementById("weight-chart");
+    const ns = "http://www.w3.org/2000/svg";
+    svg.innerHTML = "";
+    const w = 300, h = 120, pad = 12;
+    const weights = points.map(p=>p.weight);
+    const maxW = Math.max(...weights, startW);
+    const minW = Math.min(...weights, state.goalWeight);
+    const span = (maxW - minW) || 1;
+    const scaleY = v => h - pad - ((v - minW) / span) * (h - 2*pad);
+    const xStep = points.length > 1 ? (w - 2*pad) / (points.length - 1) : 0;
+
+    const goalY = scaleY(state.goalWeight);
+    const goalLine = document.createElementNS(ns, "line");
+    goalLine.setAttribute("x1", pad); goalLine.setAttribute("x2", w - pad);
+    goalLine.setAttribute("y1", goalY); goalLine.setAttribute("y2", goalY);
+    goalLine.setAttribute("stroke", "#4a7c3f"); goalLine.setAttribute("stroke-width", "2");
+    goalLine.setAttribute("stroke-dasharray", "5,4");
+    svg.appendChild(goalLine);
+
+    let d = "";
+    points.forEach((p,i)=>{
+      const x = pad + i*xStep;
+      const y = scaleY(p.weight);
+      d += (i===0 ? "M" : "L") + x + "," + y + " ";
+    });
+    const path = document.createElementNS(ns, "path");
+    path.setAttribute("d", d.trim());
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "#f1c948");
+    path.setAttribute("stroke-width", "3");
+    svg.appendChild(path);
+
+    points.forEach((p,i)=>{
+      const x = pad + i*xStep;
+      const y = scaleY(p.weight);
+      const dot = document.createElementNS(ns, "rect");
+      dot.setAttribute("x", x-3); dot.setAttribute("y", y-3);
+      dot.setAttribute("width", 6); dot.setAttribute("height", 6);
+      dot.setAttribute("fill", "#f1c948");
+      svg.appendChild(dot);
+    });
+
+    // ---- liste des dernières pesées ----
+    const listEl = document.getElementById("weight-history-list");
+    listEl.innerHTML = "";
+    const recent = points.slice().reverse().slice(0, 8);
+    if(recent.length <= 1){
+      listEl.innerHTML = '<p class="empty-note">Pèse-toi régulièrement pour voir ton évolution ici 📉</p>';
+    } else {
+      recent.forEach(p=>{
+        const dObj = new Date(p.date + "T12:00:00");
+        const row = document.createElement("div");
+        row.className = "histrow";
+        row.innerHTML = `<div class="hemoji">⚖️</div><div class="hday">${dObj.toLocaleDateString("fr-FR",{day:"numeric", month:"short", year:"numeric"})}</div><div class="hpct">${p.weight} kg</div>`;
+        listEl.appendChild(row);
+      });
+    }
+  }
+
+  function renderHistory(){
+    document.getElementById("streak-count").textContent = state.streak || 0;
+    document.getElementById("best-streak").textContent = state.bestStreak || 0;
+
+    const dates = Object.keys(state.dailyChecksByDate).filter(d => d !== state.currentDate).sort().reverse();
+    const list = document.getElementById("history-list");
+    list.innerHTML = "";
+    if(dates.length === 0){
+      list.innerHTML = '<p class="empty-note">Reviens demain pour voir ton premier jour ici 👋</p>';
+      document.getElementById("success-rate").textContent = "—";
+      return;
+    }
+    let sumPct = 0;
+    dates.slice(0, 10).forEach(d=>{
+      const dateObj = new Date(d + "T12:00:00");
+      const quests = getActiveDailyQuests(dateObj);
+      const checks = state.dailyChecksByDate[d] || {};
+      const done = quests.filter(q => checks[q.id]).length;
+      const pct = quests.length ? Math.round(done/quests.length*100) : 0;
+      sumPct += pct;
+      const emoji = pct >= 100 ? "🟢" : (pct >= 50 ? "🟡" : "🔴");
+      const row = document.createElement("div");
+      row.className = "histrow";
+      row.innerHTML = `<div class="hemoji">${emoji}</div><div class="hday">${dateObj.toLocaleDateString("fr-FR",{weekday:"long", day:"numeric", month:"short"})}</div><div class="hpct">${done}/${quests.length}</div>`;
+      list.appendChild(row);
+    });
+    document.getElementById("success-rate").textContent = Math.round(sumPct / Math.min(dates.length,10)) + "%";
+  }
+
+  // ---------- scènes pixel-art de la carte (canvas 320x200, grille 160x100, blocs de 2px) ----------
+  function b(ctx, gx, gy, gw, gh, color){
+    ctx.fillStyle = color;
+    ctx.fillRect(gx * 2, gy * 2, gw * 2, gh * 2);
+  }
+  function cloud(ctx, x, y, c){
+    c = c || "rgba(255,255,255,0.8)";
+    b(ctx,x,y,18,6,c); b(ctx,x+5,y-4,10,5,c); b(ctx,x-4,y+3,26,4,c);
+  }
+  function star(ctx, x, y){ b(ctx,x,y,1,1,"#f1f0e0"); }
+
+  function drawVillage(ctx){
+    b(ctx,0,0,160,30,"#7fc0e6");
+    b(ctx,0,30,160,28,"#9ad2ea");
+    b(ctx,0,58,160,10,"#b8e0ef");
+    cloud(ctx,20,14); cloud(ctx,95,8,"rgba(255,255,255,0.65)");
+    b(ctx,128,10,20,20,"#f1c948"); b(ctx,124,6,28,4,"rgba(241,201,72,0.35)"); b(ctx,124,30,28,4,"rgba(241,201,72,0.35)");
+    b(ctx,0,68,160,32,"#6fae5c");
+    b(ctx,0,68,160,4,"#7fbf6a");
+    [10,40,70,100,130,150].forEach(x=> b(ctx,x,74+((x/10)%3)*4,6,3,"#5a9a4c"));
+    b(ctx,55,72,26,28,"#c9a869"); b(ctx,55,72,26,4,"#d9bf8f");
+    b(ctx,20,55,26,22,"#8b5a2b"); b(ctx,17,45,32,12,"#a13d2b"); b(ctx,15,55,3,22,"#6b4423"); b(ctx,52,55,3,22,"#6b4423");
+    b(ctx,28,66,6,8,"#3d2a1a"); b(ctx,38,63,5,5,"#f1c948"); b(ctx,33,48,4,6,"#5a4a30"); b(ctx,32,38,2,10,"rgba(220,220,220,0.5)");
+    b(ctx,108,58,24,20,"#8b5a2b"); b(ctx,105,49,30,11,"#a13d2b"); b(ctx,103,58,3,20,"#6b4423"); b(ctx,132,58,3,20,"#6b4423");
+    b(ctx,114,68,6,8,"#3d2a1a"); b(ctx,124,64,5,5,"#f1c948");
+    [0,6,12,18,24,144,150,156].forEach(x=> b(ctx,x,84,2,10,"#8b5a2b"));
+    b(ctx,6,88,150,1,"#6b4423");
+    b(ctx,8,80,3,16,"#3d2a1a"); b(ctx,0,64,12,18,"#2f6b2f"); b(ctx,3,58,8,10,"#3d8a3d");
+    b(ctx,145,82,3,18,"#3d2a1a"); b(ctx,138,66,16,20,"#2f6b2f"); b(ctx,141,60,10,10,"#3d8a3d");
+  }
+
+  function drawForest(ctx){
+    b(ctx,0,0,160,20,"#4a6a62");
+    b(ctx,0,20,160,20,"#5c7a72");
+    b(ctx,0,40,160,20,"#3d5a52");
+    b(ctx,0,60,160,40,"#2a4228");
+    b(ctx,0,60,160,4,"#345234");
+    [8,26,44,62,80,98,116,134,150].forEach((x,i)=>{
+      const h = 22 + (i % 3) * 8;
+      const top = 58 - h;
+      b(ctx,x+4,top+h-6,2,10,"#2a1a10");
+      b(ctx,x-6,top+16,18,10,"#16330f");
+      b(ctx,x-4,top+8,14,10,"#1f4a1a");
+      b(ctx,x-2,top,10,10,"#2f5a2f");
+    });
+    cloud(ctx,10,12,"rgba(255,255,255,0.3)");
+    cloud(ctx,90,18,"rgba(255,255,255,0.25)");
+    b(ctx,0,32,50,8,"rgba(230,240,235,0.3)");
+    b(ctx,90,44,60,10,"rgba(230,240,235,0.25)");
+    b(ctx,70,60,10,40,"#6b5a3a");
+  }
+
+  function drawRiver(ctx){
+    b(ctx,0,0,160,20,"#a9d8e0");
+    b(ctx,0,20,160,10,"#c8e8ec");
+    cloud(ctx,15,8,"rgba(255,255,255,0.7)"); cloud(ctx,110,6,"rgba(255,255,255,0.6)");
+    b(ctx,0,30,160,20,"#6fae5c"); b(ctx,0,30,160,4,"#7fbf6a");
+    b(ctx,0,76,160,24,"#5a9a4c");
+    b(ctx,0,44,160,32,"#3d8fc0");
+    b(ctx,0,46,160,3,"#5cb3e0"); b(ctx,0,54,160,2,"#5cb3e0"); b(ctx,0,62,160,3,"#4fa5d8"); b(ctx,0,70,160,2,"#5cb3e0");
+    b(ctx,0,44,160,3,"#2f6b96");
+    [20,55,90,125].forEach(x=> b(ctx,x,50+((x/10)%3)*6,10,2,"rgba(255,255,255,0.4)"));
+    b(ctx,65,36,30,44,"#8b5a2b"); b(ctx,65,36,30,5,"#6b4423");
+    [70,80,90].forEach(x=> b(ctx,x,41,2,35,"#6b4423"));
+    b(ctx,10,84,14,10,"#3d8a3d"); b(ctx,130,80,16,12,"#3d8a3d");
+  }
+
+  function drawCamp(ctx){
+    b(ctx,0,0,160,26,"#3d2e50");
+    b(ctx,0,26,160,26,"#4a3a5a");
+    b(ctx,0,52,160,12,"#5a4a68");
+    [12,44,76,108,140].forEach(x=> star(ctx,x,8+((x/10)%3)*6));
+    b(ctx,120,10,10,10,"#e8dcc0");
+    b(ctx,0,64,160,36,"#2a2a1a"); b(ctx,0,64,160,4,"#3a3524");
+    b(ctx,30,38,26,26,"#6b6b6b"); b(ctx,27,38,32,4,"#8a8a8a"); b(ctx,40,50,6,14,"#1a1a12");
+    b(ctx,96,42,26,22,"#5a5a5a"); b(ctx,93,42,32,4,"#7a7a7a"); b(ctx,106,52,6,12,"#1a1a12");
+    b(ctx,70,68,8,20,"#8a8a8a"); b(ctx,66,72,3,3,"#c9553d");
+    b(ctx,67,70,10,4,"#8a8a8a");
+    b(ctx,10,72,10,12,"#c9553d"); b(ctx,12,66,6,8,"#f1c948"); b(ctx,13,60,4,6,"#ff9955");
+    [4,8,12,16,20].forEach(x=> b(ctx,x,84,2,4,"#3d2a1a"));
+    b(ctx,140,70,3,18,"#5a4a30"); b(ctx,136,66,11,4,"#6b6b6b");
+  }
+
+  function drawMountain(ctx){
+    b(ctx,0,0,160,30,"#cfe0ea");
+    b(ctx,0,30,160,30,"#dfeaf0");
+    cloud(ctx,20,20,"rgba(255,255,255,0.8)"); cloud(ctx,110,26,"rgba(255,255,255,0.7)");
+    b(ctx,0,68,160,32,"#7a7a7a");
+    b(ctx,20,50,60,50,"#8a8a8a");
+    b(ctx,80,58,60,42,"#7a7a7a");
+    b(ctx,40,34,44,32,"#9a9a9a");
+    b(ctx,55,24,20,16,"#b8b8b8");
+    b(ctx,60,16,12,12,"#f0f4f8");
+    b(ctx,58,26,18,6,"#f5f8fb");
+    [45,50,90,95,100].forEach((x,i)=> b(ctx,x,60+i*4,10,3,"#f0f4f8"));
+    [50,70,90,110].forEach((x,i)=> b(ctx,x,80+(i%2)*4,3,3,"#d4a017"));
+    b(ctx,0,90,160,10,"#5a5a5a");
+  }
+
+  function drawTemple(ctx){
+    b(ctx,0,0,160,30,"#e6a860");
+    b(ctx,0,30,160,26,"#eabf80");
+    b(ctx,0,56,160,12,"#f0d0a0");
+    b(ctx,110,14,20,20,"#f8e0a0");
+    cloud(ctx,20,20,"rgba(255,255,255,0.35)");
+    b(ctx,0,68,160,32,"#8b7a5a"); b(ctx,0,68,160,4,"#a0906c");
+    b(ctx,20,50,120,8,"#d9c69a"); b(ctx,15,46,130,6,"#e8d9b0");
+    b(ctx,20,58,120,4,"#c9b483");
+    [26,46,66,86,106,126].forEach(x=>{
+      b(ctx,x,58,8,32,"#c9b483");
+      b(ctx,x,58,8,3,"#e8d9b0");
+      b(ctx,x+2,58,1,32,"rgba(0,0,0,0.15)");
+    });
+    b(ctx,10,36,140,12,"#a13d2b");
+    b(ctx,10,32,140,5,"#8b3020");
+    b(ctx,70,20,20,16,"#a13d2b");
+    b(ctx,60,84,40,16,"#6b5a3a");
+  }
+
+  function drawRuins(ctx){
+    b(ctx,0,0,160,40,"#161028");
+    b(ctx,0,40,160,32,"#1f1a38");
+    for(let i=0;i<18;i++){ star(ctx, (i*37+7)%160, (i*23+4)%60); }
+    b(ctx,120,10,14,14,"#e8e0f0"); b(ctx,118,8,3,3,"rgba(232,224,240,0.4)");
+    b(ctx,0,72,160,28,"#2a2438"); b(ctx,0,72,160,4,"#332c44");
+    b(ctx,24,44,12,36,"#5a5468"); b(ctx,24,44,12,3,"#6b6478");
+    b(ctx,60,32,12,48,"#5a5468"); b(ctx,60,32,12,3,"#6b6478"); b(ctx,58,28,16,5,"#3d3850");
+    b(ctx,104,52,12,28,"#4a4458"); b(ctx,104,52,12,3,"#5a5468");
+    b(ctx,132,36,12,44,"#5a5468"); b(ctx,132,36,12,3,"#6b6478");
+    b(ctx,90,80,20,4,"#3d3850");
+    [10,40,75,95,120,150].forEach(x=> b(ctx,x,86+((x/10)%2)*4,6,3,"#141020"));
+  }
+
+  function drawKingdom(ctx){
+    b(ctx,0,0,160,26,"#f1c948");
+    b(ctx,0,26,160,20,"#f6d878");
+    b(ctx,0,46,160,22,"#f9e6a8");
+    cloud(ctx,20,14,"rgba(255,255,255,0.55)"); cloud(ctx,110,10,"rgba(255,255,255,0.45)");
+    b(ctx,0,68,160,32,"#8a8a8a"); b(ctx,0,68,160,4,"#9a9a9a");
+    b(ctx,48,34,64,40,"#6b6b6b");
+    for(let x=48;x<112;x+=8){ b(ctx,x,30,4,4,"#6b6b6b"); }
+    b(ctx,40,14,16,32,"#5a5a5a"); b(ctx,104,14,16,32,"#5a5a5a");
+    for(let x=40;x<56;x+=4){ b(ctx,x,10,3,3,"#5a5a5a"); }
+    for(let x=104;x<120;x+=4){ b(ctx,x,10,3,3,"#5a5a5a"); }
+    b(ctx,68,6,24,24,"#7a7a7a");
+    for(let x=68;x<92;x+=4){ b(ctx,x,2,3,3,"#7a7a7a"); }
+    b(ctx,44,2,2,10,"#3d2a1a"); b(ctx,44,0,6,3,"#c9553d");
+    b(ctx,112,2,2,10,"#3d2a1a"); b(ctx,109,0,6,3,"#c9553d");
+    b(ctx,78,-2,2,10,"#3d2a1a"); b(ctx,75,-4,6,3,"#f1c948");
+    b(ctx,72,80,16,20,"#3d2a1a"); b(ctx,76,84,3,4,"#f1c948");
+    [56,64,96,104].forEach(x=> b(ctx,x,50,6,18,"#5a5a5a"));
+  }
+
+  const ZONE_SCENES = [drawVillage, drawForest, drawRiver, drawCamp, drawMountain, drawTemple, drawRuins, drawKingdom];
+
+  function drawZoneScene(idx){
+    const canvas = document.getElementById("zone-canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    (ZONE_SCENES[idx] || drawVillage)(ctx);
+  }
+
+  function renderStepsHistory(){
+    const dates = Object.keys(state.dailyChecksByDate).sort();
+    const points = dates.map(dateKey=>{
+      const dateObj = new Date(dateKey + "T12:00:00");
+      const dayDef = DAY_QUESTS[dateObj.getDay()];
+      const stepsQuest = dayDef ? dayDef.main.find(q => q.type === "steps") : null;
+      const steps = stepsQuest ? (state.dailyChecksByDate[dateKey][stepsQuest.id + "__progress"] || 0) : 0;
+      const target = stepsQuest ? stepsQuest.amount : 8000;
+      return {date: dateKey, steps, target};
+    }).filter(p => p.steps > 0 || p.date === state.currentDate);
+
+    const svg = document.getElementById("steps-chart");
+    svg.innerHTML = "";
+    const listEl = document.getElementById("steps-history-list");
+    listEl.innerHTML = "";
+
+    if(points.length === 0){
+      listEl.innerHTML = '<p class="empty-note">Note tes premiers pas pour voir ton historique ici 👣</p>';
+      return;
+    }
+
+    const recentPoints = points.slice(-14);
+    const ns = "http://www.w3.org/2000/svg";
+    const w = 300, h = 100, pad = 6;
+    const maxVal = Math.max(...recentPoints.map(p => Math.max(p.steps, p.target)), 1000);
+    const barW = (w - 2 * pad) / recentPoints.length;
+
+    recentPoints.forEach((p, i)=>{
+      const x = pad + i * barW;
+      const barH = (p.steps / maxVal) * (h - 2 * pad);
+      const y = h - pad - barH;
+      const rect = document.createElementNS(ns, "rect");
+      rect.setAttribute("x", x + barW * 0.15);
+      rect.setAttribute("y", y);
+      rect.setAttribute("width", barW * 0.7);
+      rect.setAttribute("height", barH);
+      rect.setAttribute("fill", p.steps >= p.target ? "#6fae5c" : "#f1c948");
+      svg.appendChild(rect);
+    });
+
+    const goalY = h - pad;
+    const targetLineY = h - pad - (recentPoints[recentPoints.length-1].target / maxVal) * (h - 2*pad);
+    const goalLine = document.createElementNS(ns, "line");
+    goalLine.setAttribute("x1", pad); goalLine.setAttribute("x2", w - pad);
+    goalLine.setAttribute("y1", targetLineY); goalLine.setAttribute("y2", targetLineY);
+    goalLine.setAttribute("stroke", "#c9553d"); goalLine.setAttribute("stroke-width", "1");
+    goalLine.setAttribute("stroke-dasharray", "4,3");
+    svg.appendChild(goalLine);
+
+    points.slice().reverse().slice(0, 10).forEach(p=>{
+      const dObj = new Date(p.date + "T12:00:00");
+      const reached = p.steps >= p.target;
+      const row = document.createElement("div");
+      row.className = "histrow";
+      row.innerHTML = `<div class="hemoji">${reached ? "🟢" : (p.steps > 0 ? "🟡" : "⚪")}</div><div class="hday">${dObj.toLocaleDateString("fr-FR",{weekday:"short", day:"numeric", month:"short"})}</div><div class="hpct">${p.steps.toLocaleString("fr-FR")} pas</div>`;
+      listEl.appendChild(row);
+    });
+  }
+
+  function renderMap(){
+    const totalSteps = state.stepsTotal || 0;
+    document.getElementById("map-steps-total").textContent = totalSteps.toLocaleString("fr-FR");
+
+    let currentIdx = 0;
+    for(let i = 0; i < MAP_ZONES.length; i++){
+      if(totalSteps >= MAP_ZONES[i].threshold) currentIdx = i;
+    }
+    const currentZone = MAP_ZONES[currentIdx];
+    const nextZone = MAP_ZONES[currentIdx + 1];
+    document.getElementById("map-current-zone").textContent = currentZone.icon + " " + currentZone.name;
+    drawZoneScene(currentIdx);
+
+    const now = new Date();
+    const todayStepsQuest = DAY_QUESTS[now.getDay()].main.find(q => q.type === "steps");
+    if(todayStepsQuest){
+      const progress = getTodayChecks()[todayStepsQuest.id + "__progress"] || 0;
+      document.getElementById("input-daily-steps").value = progress;
+      document.getElementById("daily-steps-target").textContent =
+        nextZone ? (nextZone.threshold - totalSteps).toLocaleString("fr-FR") : "0";
+    }
+
+    if(nextZone){
+      const remaining = nextZone.threshold - totalSteps;
+      document.getElementById("map-next-info").textContent = "Encore " + remaining.toLocaleString("fr-FR") + " pas pour découvrir la prochaine zone";
+      const span = nextZone.threshold - currentZone.threshold;
+      const pct = Math.max(0, Math.min(100, Math.round((totalSteps - currentZone.threshold) / span * 100)));
+      document.getElementById("map-progress-bar").style.width = pct + "%";
+    } else {
+      document.getElementById("map-next-info").textContent = "🏆 Tu as atteint la destination finale de ton voyage !";
+      document.getElementById("map-progress-bar").style.width = "100%";
+    }
+
+    const path = document.getElementById("map-path");
+    path.innerHTML = "";
+    MAP_ZONES.forEach((zone, idx)=>{
+      const reached = idx <= currentIdx;
+      const isCurrent = idx === currentIdx;
+      const div = document.createElement("div");
+      div.className = "mapzone" + (reached ? " reached" : " fogged") + (isCurrent ? " current" : "");
+      if(reached){
+        div.innerHTML = `
+          <div class="mz-icon">${zone.icon}${isCurrent ? '<span class="mz-avatar">🧍</span>' : ""}</div>
+          <div class="mz-info"><b>${zone.name}</b><span>${zone.flavor}</span></div>`;
+      } else {
+        div.innerHTML = `
+          <div class="mz-icon">❓</div>
+          <div class="mz-info"><b>???</b><span>${(zone.threshold - totalSteps).toLocaleString("fr-FR")} pas pour révéler cette zone</span></div>`;
+      }
+      path.appendChild(div);
+    });
+  }
+
+  function renderAll(){
+    renderHUD();
+    renderDashboard();
+    renderWeightHistory();
+    renderLevelPath();
+    renderQuetes();
+    renderHistory();
+    renderMap();
+    renderStepsHistory();
+    renderGuilde();
+    renderFinal();
+  }
+
+  // ---------- events ----------
+  document.getElementById("btn-save-weight").addEventListener("click", ()=>{
+    const val = parseFloat(document.getElementById("input-weight").value);
+    if(isNaN(val) || val <= 0) return;
+    const prevLevel = getLevelInfo(state.weight);
+    state.weight = val;
+    const newLevel = getLevelInfo(state.weight);
+    const todayEntry = state.weightHistory.find(h => h.date === state.currentDate);
+    if(todayEntry){ todayEntry.weight = val; }
+    else { state.weightHistory.push({date: state.currentDate, weight: val}); }
+    checkAutoAchievements();
+    saveState();
+    renderAll();
+    if(newLevel.kg !== prevLevel.kg && state.weight <= newLevel.kg){
+      awardChest("Coffre du Niveau");
+      showLevelUp(["NIVEAU " + newLevel.n + " ATTEINT !", newLevel.kg + " KG", newLevel.reward]);
+    } else {
+      showToast("Poids mis à jour : " + state.weight + " kg");
+    }
+  });
+
+  document.getElementById("btn-save-goal").addEventListener("click", ()=>{
+    const val = parseFloat(document.getElementById("input-goal").value);
+    if(isNaN(val) || val <= 0) return;
+    state.goalWeight = val;
+    checkAutoAchievements();
+    saveState();
+    renderAll();
+    showToast("🎯 Nouvel objectif : " + val + " kg");
+  });
+
+  document.getElementById("btn-save-daily-steps").addEventListener("click", ()=>{
+    const val = recordDailySteps(document.getElementById("input-daily-steps").value);
+    if(val === null) return;
+    document.getElementById("input-daily-steps").value = val;
+    showToast("👣 Pas enregistrés : " + val);
+    renderAll();
+  });
+
+  document.getElementById("btn-protect-today").addEventListener("click", ()=>{
+    if(state.jokers <= 0) return;
+    if(state.protectedDates[state.currentDate]) return;
+    state.jokers -= 1;
+    state.protectedDates[state.currentDate] = true;
+    showToast("🃏 Aujourd'hui est protégé — ton combo est en sécurité !");
+    saveState();
+    renderAll();
+  });
+
+  document.getElementById("btn-joker-recover").addEventListener("click", ()=>{
+    const yKey = document.getElementById("joker-recovery").dataset.yKey;
+    if(!yKey || state.jokers <= 0) return;
+    state.jokers -= 1;
+    state.protectedDates[yKey] = true;
+    computeStreakAndBest();
+    checkComboMilestones();
+    showToast("🃏 Combo restauré grâce à ton joker !");
+    saveState();
+    renderAll();
+  });
+
+  document.getElementById("btn-joker-dismiss").addEventListener("click", ()=>{
+    const yKey = document.getElementById("joker-recovery").dataset.yKey;
+    if(yKey){ state.jokerRecoveryDismissed[yKey] = true; }
+    saveState();
+    renderJokers();
+  });
+
+  document.getElementById("btn-boss-week").addEventListener("click", ()=>{
+    if(new Date().getDay() !== 6) return;
+    const wk = isoWeekKey();
+    if(state.bossWeekKey === wk) return;
+    state.bossWeekKey = wk;
+    addXP(100);
+    awardChest("Coffre du Guerrier");
+    showToast("⚔️ Boss du samedi vaincu ! +100 XP");
+    renderAll();
+  });
+
+  document.getElementById("btn-boss-anniv").addEventListener("click", ()=>{
+    showToast("🎂 Aucune culpabilité. On reprend demain !");
+    const a = ACHIEVEMENTS.find(x=>x.id==="balance");
+    if(a && !state.achievements[a.id]){ claimAchievement(a); }
+  });
+
+  document.getElementById("btn-draw-challenge").addEventListener("click", ()=>{
+    const wk = isoWeekKey();
+    const pick = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
+    state.weeklyChallenge = {weekKey: wk, text: pick, completed:false};
+    saveState();
+    renderQuetes();
+    showToast("🎲 Nouveau défi tiré !");
+  });
+
+  document.getElementById("btn-complete-challenge").addEventListener("click", ()=>{
+    if(state.weeklyChallenge.completed) return;
+    state.weeklyChallenge.completed = true;
+    addXP(40);
+    awardChest("Coffre du Défi");
+    showToast("✅ Défi relevé ! +40 XP");
+    renderQuetes();
+  });
+
+  const TAB_ORDER = ["accueil", "quetes", "carte", "guilde", "final"];
+
+  function activateScreen(name, direction){
+    const current = document.querySelector(".screen.active");
+    const currentName = current ? current.id.replace("screen-", "") : null;
+    if(currentName === name) return;
+
+    document.querySelectorAll("#tabbar button").forEach(b=>{
+      b.classList.toggle("active", b.dataset.screen === name);
+    });
+    document.querySelectorAll(".screen").forEach(s=>{
+      s.classList.remove("active", "slide-left", "slide-right");
+    });
+    const next = document.getElementById("screen-" + name);
+    next.classList.add("active", direction === "left" ? "slide-left" : "slide-right");
+    document.querySelector("main").scrollTo(0,0);
+  }
+
+  document.querySelectorAll("#tabbar button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const fromIdx = TAB_ORDER.indexOf(document.querySelector(".screen.active").id.replace("screen-",""));
+      const toIdx = TAB_ORDER.indexOf(btn.dataset.screen);
+      activateScreen(btn.dataset.screen, toIdx >= fromIdx ? "right" : "left");
+    });
+  });
+
+  // ---------- swipe entre onglets ----------
+  (function setupSwipe(){
+    const main = document.querySelector("main");
+    let startX = 0, startY = 0, startTime = 0, tracking = false;
+
+    main.addEventListener("touchstart", (e)=>{
+      const t = e.changedTouches[0];
+      startX = t.clientX; startY = t.clientY; startTime = Date.now();
+      tracking = true;
+    }, {passive:true});
+
+    main.addEventListener("touchend", (e)=>{
+      if(!tracking) return;
+      tracking = false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      const dt = Date.now() - startTime;
+      const isHorizontalSwipe = Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4 && dt < 700;
+      if(!isHorizontalSwipe) return;
+
+      const currentName = document.querySelector(".screen.active").id.replace("screen-", "");
+      const idx = TAB_ORDER.indexOf(currentName);
+      if(dx < 0 && idx < TAB_ORDER.length - 1){
+        activateScreen(TAB_ORDER[idx + 1], "left");
+      } else if(dx > 0 && idx > 0){
+        activateScreen(TAB_ORDER[idx - 1], "right");
+      }
+    }, {passive:true});
+  })();
+
+  // ---------- bibliothèque d'exercices ----------
+  let currentExerciseSet = null;
+
+  function openExerciseModal(type){
+    currentExerciseSet = type === "equip" ? EXERCISES_WITH_EQUIPMENT : EXERCISES_NO_EQUIPMENT;
+    document.getElementById("exercise-modal-title").textContent =
+      type === "equip" ? "🎒 EXERCICES AVEC MATÉRIEL" : "🏠 EXERCICES SANS MATÉRIEL";
+
+    const select = document.getElementById("exercise-select");
+    select.innerHTML = '<option value="">-- Choisis un exercice --</option>';
+    currentExerciseSet.forEach((group, gi)=>{
+      const optgroup = document.createElement("optgroup");
+      optgroup.label = group.group;
+      group.items.forEach((ex, ii)=>{
+        const opt = document.createElement("option");
+        opt.value = gi + "|" + ii;
+        opt.textContent = ex.name;
+        optgroup.appendChild(opt);
+      });
+      select.appendChild(optgroup);
+    });
+
+    document.getElementById("exercise-info").innerHTML = '<p class="ex-placeholder">Choisis un exercice dans la liste ci-dessus 👆</p>';
+    document.getElementById("exercise-modal").classList.add("show");
+  }
+
+  document.getElementById("btn-open-no-equip").addEventListener("click", ()=> openExerciseModal("no-equip"));
+  document.getElementById("btn-open-equip").addEventListener("click", ()=> openExerciseModal("equip"));
+
+  document.getElementById("exercise-select").addEventListener("change", (e)=>{
+    const val = e.target.value;
+    const info = document.getElementById("exercise-info");
+    if(!val || !currentExerciseSet){
+      info.innerHTML = '<p class="ex-placeholder">Choisis un exercice dans la liste ci-dessus 👆</p>';
+      return;
+    }
+    const [gi, ii] = val.split("|").map(Number);
+    const ex = currentExerciseSet[gi].items[ii];
+    info.innerHTML = `<div class="ex-muscles">💪 Muscles : ${ex.muscles}</div><div class="ex-how"><b>Comment faire :</b> ${ex.how}</div>`;
+  });
+
+  document.getElementById("exercise-modal-close").addEventListener("click", ()=>{
+    document.getElementById("exercise-modal").classList.remove("show");
+  });
+  document.getElementById("exercise-modal").addEventListener("click", (e)=>{
+    if(e.target.id === "exercise-modal"){ document.getElementById("exercise-modal").classList.remove("show"); }
+  });
+
+  // ---------- init ----------
+  loadState().then(()=>{
+    renderAll();
+  });
+
+  // Vérifie régulièrement si on est passé au jour suivant (au cas où l'app
+  // reste ouverte sans être rechargée), pour remettre les saisies du jour à 0.
+  setInterval(()=>{
+    if(state.currentDate !== todayKey()){
+      rolloverDayIfNeeded();
+      renderAll();
+    }
+  }, 60000);
+})();
+</script>
+</body>
+</html>
