@@ -624,7 +624,7 @@
     <div class="panel">
       <h2>🗺️ LA CARTE DU MONDE</h2>
       <p class="sub">Chaque pas réel te fait avancer physiquement dans ce monde.</p>
-      <img id="zone-image" src="images/village.png" alt="Paysage de la zone actuelle">
+      <img id="zone-image" src="village.png.PNG" alt="Paysage de la zone actuelle">
       <div class="dash-grid">
         <div class="dash-tile"><b id="map-steps-total">0</b><span>👣 Pas cumulés</span></div>
         <div class="dash-tile"><b id="map-current-zone">🌱</b><span>Zone actuelle</span></div>
@@ -670,7 +670,7 @@
     <div class="panel">
       <h2>👤 TON PERSONNAGE</h2>
       <div class="avatar-card">
-        <img id="avatar-image" src="images/perso-1-recrue.jpg" alt="Ton personnage">
+        <img id="avatar-image" src="perso-1-recrue.png.jpg" alt="Ton personnage">
         <div class="avatar-title pixel-font" id="avatar-title">HUGO 1.0</div>
         <div class="coin-badge">🪙 <span id="coin-balance">0</span></div>
         <div class="avatar-slots" id="avatar-slots" style="margin-top:12px;"></div>
@@ -921,14 +921,14 @@
   ];
 
   const MAP_ZONES = [
-    {threshold:0, icon:"🌱", name:"Village du Départ", flavor:"Ton aventure commence ici.", img:"village.png"},
-    {threshold:15000, icon:"🌲", name:"Forêt de la Constance", flavor:"Les arbres se dressent, silencieux et patients — comme toi.", img:"foret.png"},
-    {threshold:35000, icon:"🌊", name:"Rivière de l'Hydratation", flavor:"L'eau claire coule à travers toute la vallée.", img:"riviere.png"},
-    {threshold:60000, icon:"🏕️", name:"Campement du Guerrier", flavor:"Des braises encore chaudes, une épée plantée dans le sol.", img:"campement.png"},
-    {threshold:90000, icon:"⛰️", name:"Montagne de la Discipline", flavor:"Le chemin devient raide. Continue.", img:"montagne.png"},
-    {threshold:125000, icon:"🏯", name:"Temple du Sage", flavor:"Un lieu de calme, où le repos devient une force.", img:"temple.png"},
-    {threshold:165000, icon:"🗿", name:"Ruines Oubliées", flavor:"Personne ne sait ce qui se cache ici depuis si longtemps.", img:"ruines.png"},
-    {threshold:210000, icon:"👑", name:"Royaume de Hugo 2.0", flavor:"La destination finale de ton voyage.", img:"royaume.png"}
+    {threshold:0, icon:"🌱", name:"Village du Départ", flavor:"Ton aventure commence ici.", img:"village.png.PNG"},
+    {threshold:15000, icon:"🌲", name:"Forêt de la Constance", flavor:"Les arbres se dressent, silencieux et patients — comme toi.", img:"foret.png.PNG"},
+    {threshold:35000, icon:"🌊", name:"Rivière de l'Hydratation", flavor:"L'eau claire coule à travers toute la vallée.", img:"riviere.png.PNG"},
+    {threshold:60000, icon:"🏕️", name:"Campement du Guerrier", flavor:"Des braises encore chaudes, une épée plantée dans le sol.", img:"campement.png.PNG"},
+    {threshold:90000, icon:"⛰️", name:"Montagne de la Discipline", flavor:"Le chemin devient raide. Continue.", img:"montagne.png.PNG"},
+    {threshold:125000, icon:"🏯", name:"Temple du Sage", flavor:"Un lieu de calme, où le repos devient une force.", img:"temple.png.PNG"},
+    {threshold:165000, icon:"🗿", name:"Ruines Oubliées", flavor:"Personne ne sait ce qui se cache ici depuis si longtemps.", img:"ruines.png.PNG"},
+    {threshold:210000, icon:"👑", name:"Royaume de Hugo 2.0", flavor:"La destination finale de ton voyage.", img:"royaume.png.PNG"}
   ];
 
   const DAY_QUESTS = {
@@ -1027,13 +1027,13 @@
 
   // Paliers visuels de l'avatar, basés sur le niveau de poids atteint (voir getLevels())
   const AVATAR_STAGES = [
-    {emoji:"🧍", title:"HUGO 1.0", img:"perso-1-recrue.jpg"},
-    {emoji:"🚶", title:"HUGO EN PROGRESSION", img:"perso-2-aventurier.jpg"},
-    {emoji:"🏃", title:"HUGO EN PROGRESSION", img:"perso-3-guerrier.jpg"},
-    {emoji:"💪", title:"HUGO EN PLEINE FORME", img:"perso-4-champion.jpg"},
-    {emoji:"🦸", title:"HUGO 2.0", img:"perso-5-heros.jpg"}
+    {emoji:"🧍", title:"HUGO 1.0", img:"perso-1-recrue.png.jpg"},
+    {emoji:"🚶", title:"HUGO EN PROGRESSION", img:"perso-2-aventurier.png.jpg"},
+    {emoji:"🏃", title:"HUGO EN PROGRESSION", img:"perso-3-guerrier.png.jpg"},
+    {emoji:"💪", title:"HUGO EN PLEINE FORME", img:"perso-4-champion.png.jpg"},
+    {emoji:"🦸", title:"HUGO 2.0", img:"perso-5-heros%20.png.jpg"}
   ];
-  const AVATAR_BOSS_STAGE = {emoji:"👑", title:"HUGO 3.0 — MODE BOSS", img:"perso-6-boss.jpg"};
+  const AVATAR_BOSS_STAGE = {emoji:"👑", title:"HUGO 3.0 — MODE BOSS", img:"perso-6-boss.png.jpg"};
 
   // Rendu visuel pixel-art associé à chaque palier (couleurs + posture)
   const STAGE_VISUALS = [
@@ -1935,7 +1935,7 @@
     const isBoss = !!state.achievements["papaenforme"];
     const stage = isBoss ? AVATAR_BOSS_STAGE : AVATAR_STAGES[stageIdx];
 
-    document.getElementById("avatar-image").src = "images/" + stage.img;
+    document.getElementById("avatar-image").src = stage.img;
     document.getElementById("avatar-image").alt = stage.title;
     document.getElementById("avatar-title").textContent = stage.title;
     document.getElementById("coin-balance").textContent = state.coins;
@@ -2502,7 +2502,7 @@
     const currentZone = MAP_ZONES[currentIdx];
     const nextZone = MAP_ZONES[currentIdx + 1];
     document.getElementById("map-current-zone").textContent = currentZone.icon + " " + currentZone.name;
-    document.getElementById("zone-image").src = "images/" + currentZone.img;
+    document.getElementById("zone-image").src = currentZone.img;
     document.getElementById("zone-image").alt = currentZone.name;
 
     const now = new Date();
