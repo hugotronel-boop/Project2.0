@@ -315,11 +315,10 @@
   .mapzone.current{ background:rgba(212,160,23,0.18); border-radius:2px; }
   .mapzone.current .mz-info b{ color:var(--wood-light); }
 
-  #zone-canvas{
-    width:100%; height:auto; aspect-ratio:320/200;
-    image-rendering:pixelated; image-rendering:crisp-edges;
+  #zone-image{
+    width:100%; height:auto;
     border:3px solid var(--wood-light); box-shadow:2px 2px 0 rgba(0,0,0,.3);
-    display:block; margin-bottom:12px; background:#000;
+    display:block; margin-bottom:12px; background:#000; object-fit:cover;
   }
   .next-obj b{ font-family:'Press Start 2P'; font-size:11px; color:var(--red); display:block; margin-bottom:6px; }
 
@@ -354,10 +353,10 @@
 
   /* avatar */
   .avatar-card{ text-align:center; padding:6px 0 4px; }
-  #avatar-canvas{
-    width:120px; height:auto; aspect-ratio:128/168; margin:0 auto;
-    image-rendering:pixelated; image-rendering:crisp-edges;
-    display:block; filter:drop-shadow(3px 3px 0 rgba(0,0,0,.3));
+  #avatar-image{
+    width:150px; height:auto; margin:0 auto;
+    display:block; border:3px solid var(--wood-light); border-radius:4px;
+    filter:drop-shadow(3px 3px 0 rgba(0,0,0,.3));
   }
   .avatar-title{ font-size:12px; color:var(--wood-light); margin:10px 0 12px; }
   .avatar-slots{ display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
@@ -625,7 +624,7 @@
     <div class="panel">
       <h2>🗺️ LA CARTE DU MONDE</h2>
       <p class="sub">Chaque pas réel te fait avancer physiquement dans ce monde.</p>
-      <canvas id="zone-canvas" width="320" height="200"></canvas>
+      <img id="zone-image" src="images/village.png" alt="Paysage de la zone actuelle">
       <div class="dash-grid">
         <div class="dash-tile"><b id="map-steps-total">0</b><span>👣 Pas cumulés</span></div>
         <div class="dash-tile"><b id="map-current-zone">🌱</b><span>Zone actuelle</span></div>
@@ -671,7 +670,7 @@
     <div class="panel">
       <h2>👤 TON PERSONNAGE</h2>
       <div class="avatar-card">
-        <canvas id="avatar-canvas" width="128" height="168"></canvas>
+        <img id="avatar-image" src="images/perso-1-recrue.jpg" alt="Ton personnage">
         <div class="avatar-title pixel-font" id="avatar-title">HUGO 1.0</div>
         <div class="coin-badge">🪙 <span id="coin-balance">0</span></div>
         <div class="avatar-slots" id="avatar-slots" style="margin-top:12px;"></div>
@@ -922,14 +921,14 @@
   ];
 
   const MAP_ZONES = [
-    {threshold:0, icon:"🌱", name:"Village du Départ", flavor:"Ton aventure commence ici."},
-    {threshold:15000, icon:"🌲", name:"Forêt de la Constance", flavor:"Les arbres se dressent, silencieux et patients — comme toi."},
-    {threshold:35000, icon:"🌊", name:"Rivière de l'Hydratation", flavor:"L'eau claire coule à travers toute la vallée."},
-    {threshold:60000, icon:"🏕️", name:"Campement du Guerrier", flavor:"Des braises encore chaudes, une épée plantée dans le sol."},
-    {threshold:90000, icon:"⛰️", name:"Montagne de la Discipline", flavor:"Le chemin devient raide. Continue."},
-    {threshold:125000, icon:"🏯", name:"Temple du Sage", flavor:"Un lieu de calme, où le repos devient une force."},
-    {threshold:165000, icon:"🗿", name:"Ruines Oubliées", flavor:"Personne ne sait ce qui se cache ici depuis si longtemps."},
-    {threshold:210000, icon:"👑", name:"Royaume de Hugo 2.0", flavor:"La destination finale de ton voyage."}
+    {threshold:0, icon:"🌱", name:"Village du Départ", flavor:"Ton aventure commence ici.", img:"village.png"},
+    {threshold:15000, icon:"🌲", name:"Forêt de la Constance", flavor:"Les arbres se dressent, silencieux et patients — comme toi.", img:"foret.png"},
+    {threshold:35000, icon:"🌊", name:"Rivière de l'Hydratation", flavor:"L'eau claire coule à travers toute la vallée.", img:"riviere.png"},
+    {threshold:60000, icon:"🏕️", name:"Campement du Guerrier", flavor:"Des braises encore chaudes, une épée plantée dans le sol.", img:"campement.png"},
+    {threshold:90000, icon:"⛰️", name:"Montagne de la Discipline", flavor:"Le chemin devient raide. Continue.", img:"montagne.png"},
+    {threshold:125000, icon:"🏯", name:"Temple du Sage", flavor:"Un lieu de calme, où le repos devient une force.", img:"temple.png"},
+    {threshold:165000, icon:"🗿", name:"Ruines Oubliées", flavor:"Personne ne sait ce qui se cache ici depuis si longtemps.", img:"ruines.png"},
+    {threshold:210000, icon:"👑", name:"Royaume de Hugo 2.0", flavor:"La destination finale de ton voyage.", img:"royaume.png"}
   ];
 
   const DAY_QUESTS = {
@@ -1028,13 +1027,13 @@
 
   // Paliers visuels de l'avatar, basés sur le niveau de poids atteint (voir getLevels())
   const AVATAR_STAGES = [
-    {emoji:"🧍", title:"HUGO 1.0"},
-    {emoji:"🚶", title:"HUGO EN PROGRESSION"},
-    {emoji:"🏃", title:"HUGO EN PROGRESSION"},
-    {emoji:"💪", title:"HUGO EN PLEINE FORME"},
-    {emoji:"🦸", title:"HUGO 2.0"}
+    {emoji:"🧍", title:"HUGO 1.0", img:"perso-1-recrue.jpg"},
+    {emoji:"🚶", title:"HUGO EN PROGRESSION", img:"perso-2-aventurier.jpg"},
+    {emoji:"🏃", title:"HUGO EN PROGRESSION", img:"perso-3-guerrier.jpg"},
+    {emoji:"💪", title:"HUGO EN PLEINE FORME", img:"perso-4-champion.jpg"},
+    {emoji:"🦸", title:"HUGO 2.0", img:"perso-5-heros.jpg"}
   ];
-  const AVATAR_BOSS_STAGE = {emoji:"👑", title:"HUGO 3.0 — MODE BOSS"};
+  const AVATAR_BOSS_STAGE = {emoji:"👑", title:"HUGO 3.0 — MODE BOSS", img:"perso-6-boss.jpg"};
 
   // Rendu visuel pixel-art associé à chaque palier (couleurs + posture)
   const STAGE_VISUALS = [
@@ -1935,9 +1934,9 @@
     if(stageIdx === -1) stageIdx = 0;
     const isBoss = !!state.achievements["papaenforme"];
     const stage = isBoss ? AVATAR_BOSS_STAGE : AVATAR_STAGES[stageIdx];
-    const visual = isBoss ? BOSS_VISUAL : STAGE_VISUALS[stageIdx];
 
-    drawCharacter(visual, state.equipment);
+    document.getElementById("avatar-image").src = "images/" + stage.img;
+    document.getElementById("avatar-image").alt = stage.title;
     document.getElementById("avatar-title").textContent = stage.title;
     document.getElementById("coin-balance").textContent = state.coins;
 
@@ -2233,157 +2232,195 @@
     document.getElementById("success-rate").textContent = Math.round(sumPct / Math.min(dates.length,10)) + "%";
   }
 
-  // ---------- scènes pixel-art de la carte (canvas 320x200, grille 160x100, blocs de 2px) ----------
+  // ---------- scènes pixel-art de la carte (canvas 640x400, grille 320x200, blocs de 2px) ----------
   function b(ctx, gx, gy, gw, gh, color){
     ctx.fillStyle = color;
     ctx.fillRect(gx * 2, gy * 2, gw * 2, gh * 2);
   }
   function cloud(ctx, x, y, c){
     c = c || "rgba(255,255,255,0.8)";
-    b(ctx,x,y,18,6,c); b(ctx,x+5,y-4,10,5,c); b(ctx,x-4,y+3,26,4,c);
+    b(ctx,x,y,36,12,c); b(ctx,x+10,y-8,20,10,c); b(ctx,x-8,y+6,52,8,c);
   }
-  function star(ctx, x, y){ b(ctx,x,y,1,1,"#f1f0e0"); }
+  function star(ctx, x, y){ b(ctx,x,y,2,2,"#f1f0e0"); }
+  // parsème une zone de petits points de texture (bruit) pour casser les aplats
+  function noise(ctx, x, y, w, h, colors, count){
+    for(let i=0;i<count;i++){
+      const nx = x + Math.floor((i*47+13) % w);
+      const ny = y + Math.floor((i*31+7) % h);
+      b(ctx, nx, ny, 2, 2, colors[i % colors.length]);
+    }
+  }
 
   function drawVillage(ctx){
-    b(ctx,0,0,160,30,"#7fc0e6");
-    b(ctx,0,30,160,28,"#9ad2ea");
-    b(ctx,0,58,160,10,"#b8e0ef");
-    cloud(ctx,20,14); cloud(ctx,95,8,"rgba(255,255,255,0.65)");
-    b(ctx,128,10,20,20,"#f1c948"); b(ctx,124,6,28,4,"rgba(241,201,72,0.35)"); b(ctx,124,30,28,4,"rgba(241,201,72,0.35)");
-    b(ctx,0,68,160,32,"#6fae5c");
-    b(ctx,0,68,160,4,"#7fbf6a");
-    [10,40,70,100,130,150].forEach(x=> b(ctx,x,74+((x/10)%3)*4,6,3,"#5a9a4c"));
-    b(ctx,55,72,26,28,"#c9a869"); b(ctx,55,72,26,4,"#d9bf8f");
-    b(ctx,20,55,26,22,"#8b5a2b"); b(ctx,17,45,32,12,"#a13d2b"); b(ctx,15,55,3,22,"#6b4423"); b(ctx,52,55,3,22,"#6b4423");
-    b(ctx,28,66,6,8,"#3d2a1a"); b(ctx,38,63,5,5,"#f1c948"); b(ctx,33,48,4,6,"#5a4a30"); b(ctx,32,38,2,10,"rgba(220,220,220,0.5)");
-    b(ctx,108,58,24,20,"#8b5a2b"); b(ctx,105,49,30,11,"#a13d2b"); b(ctx,103,58,3,20,"#6b4423"); b(ctx,132,58,3,20,"#6b4423");
-    b(ctx,114,68,6,8,"#3d2a1a"); b(ctx,124,64,5,5,"#f1c948");
-    [0,6,12,18,24,144,150,156].forEach(x=> b(ctx,x,84,2,10,"#8b5a2b"));
-    b(ctx,6,88,150,1,"#6b4423");
-    b(ctx,8,80,3,16,"#3d2a1a"); b(ctx,0,64,12,18,"#2f6b2f"); b(ctx,3,58,8,10,"#3d8a3d");
-    b(ctx,145,82,3,18,"#3d2a1a"); b(ctx,138,66,16,20,"#2f6b2f"); b(ctx,141,60,10,10,"#3d8a3d");
+    b(ctx,0,0,320,60,"#7fc0e6");
+    b(ctx,0,60,320,56,"#9ad2ea");
+    b(ctx,0,116,320,20,"#b8e0ef");
+    noise(ctx,0,0,320,60,["rgba(255,255,255,0.15)"],30);
+    cloud(ctx,40,28); cloud(ctx,190,16,"rgba(255,255,255,0.65)"); cloud(ctx,260,40,"rgba(255,255,255,0.5)");
+    b(ctx,256,20,40,40,"#f1c948"); b(ctx,248,12,56,8,"rgba(241,201,72,0.35)"); b(ctx,248,60,56,8,"rgba(241,201,72,0.35)");
+    b(ctx,0,136,320,64,"#6fae5c");
+    b(ctx,0,136,320,8,"#7fbf6a");
+    noise(ctx,0,144,320,56,["#5a9a4c","#6fae5c","#649a58"],90);
+    [20,80,140,200,260,300].forEach(x=> b(ctx,x,148+((x/20)%3)*8,12,6,"#5a9a4c"));
+    b(ctx,110,144,52,56,"#c9a869"); b(ctx,110,144,52,8,"#d9bf8f");
+    noise(ctx,110,152,52,48,["#c9a869","#d9bf8f"],20);
+    b(ctx,40,110,52,44,"#8b5a2b"); b(ctx,34,90,64,24,"#a13d2b"); b(ctx,30,110,6,44,"#6b4423"); b(ctx,104,110,6,44,"#6b4423");
+    [40,48,56,64,72,80,88].forEach(x=> b(ctx,x,90,1,24,"rgba(0,0,0,0.12)"));
+    b(ctx,56,132,12,16,"#3d2a1a"); b(ctx,76,126,10,10,"#f1c948"); b(ctx,66,96,8,12,"#5a4a30"); b(ctx,64,76,4,20,"rgba(220,220,220,0.5)");
+    b(ctx,216,116,48,40,"#8b5a2b"); b(ctx,210,98,60,22,"#a13d2b"); b(ctx,206,116,6,40,"#6b4423"); b(ctx,264,116,6,40,"#6b4423");
+    [216,224,232,240,248,256].forEach(x=> b(ctx,x,98,1,22,"rgba(0,0,0,0.12)"));
+    b(ctx,228,136,12,16,"#3d2a1a"); b(ctx,248,128,10,10,"#f1c948");
+    [0,12,24,36,48,288,300,312].forEach(x=> b(ctx,x,168,4,20,"#8b5a2b"));
+    b(ctx,12,176,300,2,"#6b4423");
+    b(ctx,16,160,6,32,"#3d2a1a"); b(ctx,0,128,24,36,"#2f6b2f"); b(ctx,6,116,16,20,"#3d8a3d"); noise(ctx,0,128,24,36,["#2f6b2f","#3d8a3d"],10);
+    b(ctx,290,164,6,36,"#3d2a1a"); b(ctx,276,132,32,40,"#2f6b2f"); b(ctx,282,120,20,20,"#3d8a3d"); noise(ctx,276,132,32,40,["#2f6b2f","#3d8a3d"],14);
   }
 
   function drawForest(ctx){
-    b(ctx,0,0,160,20,"#4a6a62");
-    b(ctx,0,20,160,20,"#5c7a72");
-    b(ctx,0,40,160,20,"#3d5a52");
-    b(ctx,0,60,160,40,"#2a4228");
-    b(ctx,0,60,160,4,"#345234");
-    [8,26,44,62,80,98,116,134,150].forEach((x,i)=>{
-      const h = 22 + (i % 3) * 8;
-      const top = 58 - h;
-      b(ctx,x+4,top+h-6,2,10,"#2a1a10");
-      b(ctx,x-6,top+16,18,10,"#16330f");
-      b(ctx,x-4,top+8,14,10,"#1f4a1a");
-      b(ctx,x-2,top,10,10,"#2f5a2f");
+    b(ctx,0,0,320,40,"#4a6a62");
+    b(ctx,0,40,320,40,"#5c7a72");
+    b(ctx,0,80,320,40,"#3d5a52");
+    b(ctx,0,120,320,80,"#2a4228");
+    b(ctx,0,120,320,8,"#345234");
+    noise(ctx,0,128,320,72,["#2a4228","#345234","#233a20"],60);
+    [16,52,88,124,160,196,232,268,300].forEach((x,i)=>{
+      const h = 44 + (i % 3) * 16;
+      const top = 116 - h;
+      b(ctx,x+8,top+h-12,4,20,"#2a1a10");
+      b(ctx,x-12,top+32,36,20,"#16330f");
+      b(ctx,x-8,top+16,28,20,"#1f4a1a");
+      b(ctx,x-4,top,20,20,"#2f5a2f");
+      noise(ctx,x-12,top+16,36,36,["#16330f","#1f4a1a","#2f5a2f"],10);
+      b(ctx,x-2,top+2,4,4,"#4a7a3a");
     });
-    cloud(ctx,10,12,"rgba(255,255,255,0.3)");
-    cloud(ctx,90,18,"rgba(255,255,255,0.25)");
-    b(ctx,0,32,50,8,"rgba(230,240,235,0.3)");
-    b(ctx,90,44,60,10,"rgba(230,240,235,0.25)");
-    b(ctx,70,60,10,40,"#6b5a3a");
+    cloud(ctx,20,24,"rgba(255,255,255,0.3)");
+    cloud(ctx,180,36,"rgba(255,255,255,0.25)");
+    b(ctx,0,64,100,16,"rgba(230,240,235,0.3)");
+    b(ctx,180,88,120,20,"rgba(230,240,235,0.25)");
+    b(ctx,140,120,20,80,"#6b5a3a");
+    [144,152,160,168].forEach(x=> b(ctx,x,124,1,72,"rgba(0,0,0,0.1)"));
   }
 
   function drawRiver(ctx){
-    b(ctx,0,0,160,20,"#a9d8e0");
-    b(ctx,0,20,160,10,"#c8e8ec");
-    cloud(ctx,15,8,"rgba(255,255,255,0.7)"); cloud(ctx,110,6,"rgba(255,255,255,0.6)");
-    b(ctx,0,30,160,20,"#6fae5c"); b(ctx,0,30,160,4,"#7fbf6a");
-    b(ctx,0,76,160,24,"#5a9a4c");
-    b(ctx,0,44,160,32,"#3d8fc0");
-    b(ctx,0,46,160,3,"#5cb3e0"); b(ctx,0,54,160,2,"#5cb3e0"); b(ctx,0,62,160,3,"#4fa5d8"); b(ctx,0,70,160,2,"#5cb3e0");
-    b(ctx,0,44,160,3,"#2f6b96");
-    [20,55,90,125].forEach(x=> b(ctx,x,50+((x/10)%3)*6,10,2,"rgba(255,255,255,0.4)"));
-    b(ctx,65,36,30,44,"#8b5a2b"); b(ctx,65,36,30,5,"#6b4423");
-    [70,80,90].forEach(x=> b(ctx,x,41,2,35,"#6b4423"));
-    b(ctx,10,84,14,10,"#3d8a3d"); b(ctx,130,80,16,12,"#3d8a3d");
+    b(ctx,0,0,320,40,"#a9d8e0");
+    b(ctx,0,40,320,20,"#c8e8ec");
+    noise(ctx,0,0,320,40,["rgba(255,255,255,0.2)"],20);
+    cloud(ctx,30,16,"rgba(255,255,255,0.7)"); cloud(ctx,220,12,"rgba(255,255,255,0.6)");
+    b(ctx,0,60,320,40,"#6fae5c"); b(ctx,0,60,320,8,"#7fbf6a");
+    noise(ctx,0,68,320,32,["#6fae5c","#5a9a4c"],40);
+    b(ctx,0,152,320,48,"#5a9a4c");
+    noise(ctx,0,152,320,48,["#5a9a4c","#4f8a42"],50);
+    b(ctx,0,88,320,64,"#3d8fc0");
+    b(ctx,0,92,320,6,"#5cb3e0"); b(ctx,0,108,320,4,"#5cb3e0"); b(ctx,0,124,320,6,"#4fa5d8"); b(ctx,0,140,320,4,"#5cb3e0");
+    b(ctx,0,88,320,6,"#2f6b96");
+    [40,110,180,250].forEach(x=> b(ctx,x,100+((x/20)%3)*12,20,4,"rgba(255,255,255,0.4)"));
+    b(ctx,130,72,60,88,"#8b5a2b"); b(ctx,130,72,60,10,"#6b4423");
+    [140,160,180].forEach(x=> b(ctx,x,82,4,70,"#6b4423"));
+    [140,160,180].forEach(x=> b(ctx,x+1,82,1,70,"rgba(0,0,0,0.15)"));
+    b(ctx,20,168,28,20,"#3d8a3d"); b(ctx,260,160,32,24,"#3d8a3d");
   }
 
   function drawCamp(ctx){
-    b(ctx,0,0,160,26,"#3d2e50");
-    b(ctx,0,26,160,26,"#4a3a5a");
-    b(ctx,0,52,160,12,"#5a4a68");
-    [12,44,76,108,140].forEach(x=> star(ctx,x,8+((x/10)%3)*6));
-    b(ctx,120,10,10,10,"#e8dcc0");
-    b(ctx,0,64,160,36,"#2a2a1a"); b(ctx,0,64,160,4,"#3a3524");
-    b(ctx,30,38,26,26,"#6b6b6b"); b(ctx,27,38,32,4,"#8a8a8a"); b(ctx,40,50,6,14,"#1a1a12");
-    b(ctx,96,42,26,22,"#5a5a5a"); b(ctx,93,42,32,4,"#7a7a7a"); b(ctx,106,52,6,12,"#1a1a12");
-    b(ctx,70,68,8,20,"#8a8a8a"); b(ctx,66,72,3,3,"#c9553d");
-    b(ctx,67,70,10,4,"#8a8a8a");
-    b(ctx,10,72,10,12,"#c9553d"); b(ctx,12,66,6,8,"#f1c948"); b(ctx,13,60,4,6,"#ff9955");
-    [4,8,12,16,20].forEach(x=> b(ctx,x,84,2,4,"#3d2a1a"));
-    b(ctx,140,70,3,18,"#5a4a30"); b(ctx,136,66,11,4,"#6b6b6b");
+    b(ctx,0,0,320,52,"#3d2e50");
+    b(ctx,0,52,320,52,"#4a3a5a");
+    b(ctx,0,104,320,24,"#5a4a68");
+    for(let i=0;i<14;i++){ star(ctx, (i*41+7)%320, (i*17+4)%50); }
+    b(ctx,240,20,20,20,"#e8dcc0"); b(ctx,236,16,4,4,"rgba(232,224,240,0.3)");
+    b(ctx,0,128,320,72,"#2a2a1a"); b(ctx,0,128,320,8,"#3a3524");
+    noise(ctx,0,136,320,64,["#2a2a1a","#332e1e"],50);
+    b(ctx,60,76,52,52,"#6b6b6b"); b(ctx,54,76,64,8,"#8a8a8a"); b(ctx,80,100,12,28,"#1a1a12");
+    noise(ctx,60,80,52,44,["#6b6b6b","#5a5a5a"],14);
+    b(ctx,192,84,52,44,"#5a5a5a"); b(ctx,186,84,64,8,"#7a7a7a"); b(ctx,212,104,12,24,"#1a1a12");
+    noise(ctx,192,88,52,36,["#5a5a5a","#4a4a4a"],12);
+    b(ctx,140,136,16,40,"#8a8a8a"); b(ctx,132,144,6,6,"#c9553d");
+    b(ctx,134,140,20,8,"#8a8a8a");
+    b(ctx,20,144,20,24,"#c9553d"); b(ctx,24,132,12,16,"#f1c948"); b(ctx,26,120,8,12,"#ff9955");
+    noise(ctx,18,128,26,32,["#ff9955","#f1c948","#c9553d"],10);
+    [8,16,24,32,40].forEach(x=> b(ctx,x,168,4,8,"#3d2a1a"));
+    b(ctx,280,140,6,36,"#5a4a30"); b(ctx,272,132,22,8,"#6b6b6b");
   }
 
   function drawMountain(ctx){
-    b(ctx,0,0,160,30,"#cfe0ea");
-    b(ctx,0,30,160,30,"#dfeaf0");
-    cloud(ctx,20,20,"rgba(255,255,255,0.8)"); cloud(ctx,110,26,"rgba(255,255,255,0.7)");
-    b(ctx,0,68,160,32,"#7a7a7a");
-    b(ctx,20,50,60,50,"#8a8a8a");
-    b(ctx,80,58,60,42,"#7a7a7a");
-    b(ctx,40,34,44,32,"#9a9a9a");
-    b(ctx,55,24,20,16,"#b8b8b8");
-    b(ctx,60,16,12,12,"#f0f4f8");
-    b(ctx,58,26,18,6,"#f5f8fb");
-    [45,50,90,95,100].forEach((x,i)=> b(ctx,x,60+i*4,10,3,"#f0f4f8"));
-    [50,70,90,110].forEach((x,i)=> b(ctx,x,80+(i%2)*4,3,3,"#d4a017"));
-    b(ctx,0,90,160,10,"#5a5a5a");
+    b(ctx,0,0,320,60,"#cfe0ea");
+    b(ctx,0,60,320,60,"#dfeaf0");
+    noise(ctx,0,0,320,60,["rgba(255,255,255,0.15)"],20);
+    cloud(ctx,40,40,"rgba(255,255,255,0.8)"); cloud(ctx,220,52,"rgba(255,255,255,0.7)");
+    b(ctx,0,136,320,64,"#7a7a7a");
+    b(ctx,40,100,120,100,"#8a8a8a");
+    b(ctx,160,116,120,84,"#7a7a7a");
+    b(ctx,80,68,88,64,"#9a9a9a");
+    noise(ctx,40,100,240,100,["#8a8a8a","#7a7a7a","#9a9a9a"],60);
+    b(ctx,110,48,40,32,"#b8b8b8");
+    b(ctx,120,32,24,24,"#f0f4f8");
+    b(ctx,116,52,36,12,"#f5f8fb");
+    [90,100,180,190,200].forEach((x,i)=> b(ctx,x,120+i*8,20,6,"#f0f4f8"));
+    [100,140,180,220].forEach((x,i)=> b(ctx,x,160+(i%2)*8,6,6,"#d4a017"));
+    b(ctx,0,180,320,20,"#5a5a5a");
+    noise(ctx,0,180,320,20,["#5a5a5a","#4a4a4a"],20);
   }
 
   function drawTemple(ctx){
-    b(ctx,0,0,160,30,"#e6a860");
-    b(ctx,0,30,160,26,"#eabf80");
-    b(ctx,0,56,160,12,"#f0d0a0");
-    b(ctx,110,14,20,20,"#f8e0a0");
-    cloud(ctx,20,20,"rgba(255,255,255,0.35)");
-    b(ctx,0,68,160,32,"#8b7a5a"); b(ctx,0,68,160,4,"#a0906c");
-    b(ctx,20,50,120,8,"#d9c69a"); b(ctx,15,46,130,6,"#e8d9b0");
-    b(ctx,20,58,120,4,"#c9b483");
-    [26,46,66,86,106,126].forEach(x=>{
-      b(ctx,x,58,8,32,"#c9b483");
-      b(ctx,x,58,8,3,"#e8d9b0");
-      b(ctx,x+2,58,1,32,"rgba(0,0,0,0.15)");
+    b(ctx,0,0,320,60,"#e6a860");
+    b(ctx,0,60,320,52,"#eabf80");
+    b(ctx,0,112,320,24,"#f0d0a0");
+    b(ctx,220,28,40,40,"#f8e0a0");
+    cloud(ctx,40,40,"rgba(255,255,255,0.35)");
+    b(ctx,0,136,320,64,"#8b7a5a"); b(ctx,0,136,320,8,"#a0906c");
+    noise(ctx,0,144,320,56,["#8b7a5a","#7a6a4a"],40);
+    b(ctx,40,100,240,16,"#d9c69a"); b(ctx,30,92,260,12,"#e8d9b0");
+    b(ctx,40,116,240,8,"#c9b483");
+    [52,92,132,172,212,252].forEach(x=>{
+      b(ctx,x,116,16,64,"#c9b483");
+      b(ctx,x,116,16,6,"#e8d9b0");
+      b(ctx,x+4,116,2,64,"rgba(0,0,0,0.15)");
+      noise(ctx,x,122,16,58,["#c9b483","#d9c69a"],6);
     });
-    b(ctx,10,36,140,12,"#a13d2b");
-    b(ctx,10,32,140,5,"#8b3020");
-    b(ctx,70,20,20,16,"#a13d2b");
-    b(ctx,60,84,40,16,"#6b5a3a");
+    b(ctx,20,72,280,24,"#a13d2b");
+    b(ctx,20,64,280,10,"#8b3020");
+    noise(ctx,20,64,280,32,["#a13d2b","#8b3020"],20);
+    b(ctx,140,40,40,32,"#a13d2b");
+    b(ctx,120,168,80,32,"#6b5a3a");
   }
 
   function drawRuins(ctx){
-    b(ctx,0,0,160,40,"#161028");
-    b(ctx,0,40,160,32,"#1f1a38");
-    for(let i=0;i<18;i++){ star(ctx, (i*37+7)%160, (i*23+4)%60); }
-    b(ctx,120,10,14,14,"#e8e0f0"); b(ctx,118,8,3,3,"rgba(232,224,240,0.4)");
-    b(ctx,0,72,160,28,"#2a2438"); b(ctx,0,72,160,4,"#332c44");
-    b(ctx,24,44,12,36,"#5a5468"); b(ctx,24,44,12,3,"#6b6478");
-    b(ctx,60,32,12,48,"#5a5468"); b(ctx,60,32,12,3,"#6b6478"); b(ctx,58,28,16,5,"#3d3850");
-    b(ctx,104,52,12,28,"#4a4458"); b(ctx,104,52,12,3,"#5a5468");
-    b(ctx,132,36,12,44,"#5a5468"); b(ctx,132,36,12,3,"#6b6478");
-    b(ctx,90,80,20,4,"#3d3850");
-    [10,40,75,95,120,150].forEach(x=> b(ctx,x,86+((x/10)%2)*4,6,3,"#141020"));
+    b(ctx,0,0,320,80,"#161028");
+    b(ctx,0,80,320,64,"#1f1a38");
+    for(let i=0;i<32;i++){ star(ctx, (i*37+7)%320, (i*23+4)%120); }
+    b(ctx,240,20,28,28,"#e8e0f0"); b(ctx,236,16,6,6,"rgba(232,224,240,0.4)");
+    b(ctx,0,144,320,56,"#2a2438"); b(ctx,0,144,320,8,"#332c44");
+    noise(ctx,0,152,320,48,["#2a2438","#241f30"],40);
+    b(ctx,48,88,24,72,"#5a5468"); b(ctx,48,88,24,6,"#6b6478");
+    b(ctx,120,64,24,96,"#5a5468"); b(ctx,120,64,24,6,"#6b6478"); b(ctx,116,56,32,10,"#3d3850");
+    b(ctx,208,104,24,56,"#4a4458"); b(ctx,208,104,24,6,"#5a5468");
+    b(ctx,264,72,24,88,"#5a5468"); b(ctx,264,72,24,6,"#6b6478");
+    noise(ctx,48,90,240,80,["#5a5468","#4a4458"],20);
+    b(ctx,180,160,40,8,"#3d3850");
+    [20,80,150,190,240,300].forEach(x=> b(ctx,x,172+((x/20)%2)*8,12,6,"#141020"));
   }
 
   function drawKingdom(ctx){
-    b(ctx,0,0,160,26,"#f1c948");
-    b(ctx,0,26,160,20,"#f6d878");
-    b(ctx,0,46,160,22,"#f9e6a8");
-    cloud(ctx,20,14,"rgba(255,255,255,0.55)"); cloud(ctx,110,10,"rgba(255,255,255,0.45)");
-    b(ctx,0,68,160,32,"#8a8a8a"); b(ctx,0,68,160,4,"#9a9a9a");
-    b(ctx,48,34,64,40,"#6b6b6b");
-    for(let x=48;x<112;x+=8){ b(ctx,x,30,4,4,"#6b6b6b"); }
-    b(ctx,40,14,16,32,"#5a5a5a"); b(ctx,104,14,16,32,"#5a5a5a");
-    for(let x=40;x<56;x+=4){ b(ctx,x,10,3,3,"#5a5a5a"); }
-    for(let x=104;x<120;x+=4){ b(ctx,x,10,3,3,"#5a5a5a"); }
-    b(ctx,68,6,24,24,"#7a7a7a");
-    for(let x=68;x<92;x+=4){ b(ctx,x,2,3,3,"#7a7a7a"); }
-    b(ctx,44,2,2,10,"#3d2a1a"); b(ctx,44,0,6,3,"#c9553d");
-    b(ctx,112,2,2,10,"#3d2a1a"); b(ctx,109,0,6,3,"#c9553d");
-    b(ctx,78,-2,2,10,"#3d2a1a"); b(ctx,75,-4,6,3,"#f1c948");
-    b(ctx,72,80,16,20,"#3d2a1a"); b(ctx,76,84,3,4,"#f1c948");
-    [56,64,96,104].forEach(x=> b(ctx,x,50,6,18,"#5a5a5a"));
+    b(ctx,0,0,320,52,"#f1c948");
+    b(ctx,0,52,320,40,"#f6d878");
+    b(ctx,0,92,320,44,"#f9e6a8");
+    noise(ctx,0,0,320,52,["rgba(255,255,255,0.15)"],20);
+    cloud(ctx,40,28,"rgba(255,255,255,0.55)"); cloud(ctx,220,20,"rgba(255,255,255,0.45)");
+    b(ctx,0,136,320,64,"#8a8a8a"); b(ctx,0,136,320,8,"#9a9a9a");
+    noise(ctx,0,144,320,56,["#8a8a8a","#7a7a7a"],40);
+    b(ctx,96,68,128,80,"#6b6b6b");
+    noise(ctx,96,68,128,80,["#6b6b6b","#5a5a5a"],30);
+    for(let x=96;x<224;x+=16){ b(ctx,x,60,8,8,"#6b6b6b"); }
+    b(ctx,80,28,32,64,"#5a5a5a"); b(ctx,208,28,32,64,"#5a5a5a");
+    noise(ctx,80,28,32,64,["#5a5a5a","#4a4a4a"],10); noise(ctx,208,28,32,64,["#5a5a5a","#4a4a4a"],10);
+    for(let x=80;x<112;x+=8){ b(ctx,x,20,6,6,"#5a5a5a"); }
+    for(let x=208;x<240;x+=8){ b(ctx,x,20,6,6,"#5a5a5a"); }
+    b(ctx,136,12,48,48,"#7a7a7a");
+    noise(ctx,136,12,48,48,["#7a7a7a","#6b6b6b"],14);
+    for(let x=136;x<184;x+=8){ b(ctx,x,4,6,6,"#7a7a7a"); }
+    b(ctx,88,4,4,20,"#3d2a1a"); b(ctx,88,0,12,6,"#c9553d");
+    b(ctx,224,4,4,20,"#3d2a1a"); b(ctx,218,0,12,6,"#c9553d");
+    b(ctx,156,-4,4,20,"#3d2a1a"); b(ctx,150,-8,12,6,"#f1c948");
+    b(ctx,144,160,32,40,"#3d2a1a"); b(ctx,152,168,6,8,"#f1c948");
+    [112,128,192,208].forEach(x=> b(ctx,x,100,12,36,"#5a5a5a"));
   }
 
   const ZONE_SCENES = [drawVillage, drawForest, drawRiver, drawCamp, drawMountain, drawTemple, drawRuins, drawKingdom];
@@ -2465,7 +2502,8 @@
     const currentZone = MAP_ZONES[currentIdx];
     const nextZone = MAP_ZONES[currentIdx + 1];
     document.getElementById("map-current-zone").textContent = currentZone.icon + " " + currentZone.name;
-    drawZoneScene(currentIdx);
+    document.getElementById("zone-image").src = "images/" + currentZone.img;
+    document.getElementById("zone-image").alt = currentZone.name;
 
     const now = new Date();
     const todayStepsQuest = DAY_QUESTS[now.getDay()].main.find(q => q.type === "steps");
