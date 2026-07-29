@@ -228,6 +228,10 @@
   }
   .bosscard h4{ font-family:'Press Start 2P'; font-size:11px; color:var(--red); margin:0 0 6px;}
   .bosscard p{ margin:4px 0 10px; font-size:17px; }
+  .boss-tier{
+    display:inline-block; font-family:'Press Start 2P'; font-size:8px; padding:4px 7px;
+    border-radius:2px; margin-bottom:8px; background:var(--wood-dark); color:var(--gold-bright);
+  }
 
   /* classes grid */
   .classgrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
@@ -426,6 +430,34 @@
   .levelup-sub{ font-family:'VT323'; font-size:20px; color:#f2e8d0; margin-bottom:10px; line-height:1.5; }
   .levelup-tap{ font-family:'Press Start 2P'; font-size:9px; color:var(--parchment-dark); margin-top:22px; }
 
+  /* boss appearance overlay */
+  #boss-overlay{
+    position:fixed; inset:0; background:rgba(20,4,4,0.94); z-index:210;
+    display:none; align-items:center; justify-content:center; flex-direction:column;
+    text-align:center; padding:24px;
+  }
+  #boss-overlay.show{ display:flex; animation:bossShake .4s steps(6); }
+  @keyframes bossShake{
+    0%{ opacity:0; transform:scale(0.85) rotate(-1deg); }
+    30%{ transform:scale(1.05) rotate(1deg); }
+    60%{ transform:scale(0.98) rotate(-0.5deg); }
+    100%{ opacity:1; transform:scale(1) rotate(0); }
+  }
+  .boss-appear-title{
+    font-size:14px; color:var(--red-bright); text-shadow:3px 3px 0 var(--wood-dark);
+    margin-bottom:18px; line-height:1.8; animation:blink 1s steps(2) infinite;
+  }
+  #boss-appear-img{
+    max-width:220px; width:70%; height:auto; border:4px solid var(--red);
+    box-shadow:4px 4px 0 rgba(0,0,0,.5); border-radius:2px; margin-bottom:16px;
+  }
+  .boss-appear-tier{
+    font-size:9px; background:var(--wood-dark); color:var(--gold-bright);
+    display:inline-block; padding:5px 9px; border-radius:2px; margin-bottom:10px;
+  }
+  .boss-appear-name{ font-size:13px; color:var(--gold-bright); margin-bottom:14px; line-height:1.6; }
+  .boss-appear-challenge{ font-family:'VT323'; font-size:20px; color:#f2e8d0; margin-bottom:6px; }
+
   /* exercise modal */
   .modal-overlay{
     position:fixed; inset:0; background:rgba(10,7,4,0.85); z-index:250;
@@ -570,6 +602,11 @@
       <h2>🧭 QUÊTES SECONDAIRES</h2>
       <p class="sub">Optionnelles, elles changent chaque jour et rapportent XP + pièces bonus.</p>
       <div id="sidequests-list"></div>
+    </div>
+
+    <div class="panel" id="random-boss-panel" style="display:none;">
+      <h2>⚠️ UN BOSS EST APPARU !</h2>
+      <div class="bosscard" id="random-boss-card"></div>
     </div>
 
     <div class="panel" id="event-panel" style="display:none;">
@@ -727,6 +764,15 @@
   <div class="levelup-sub" id="levelup-sub"></div>
   <div class="levelup-swords" id="levelup-banner-bottom">⚔️⚔️⚔️⚔️⚔️</div>
   <div class="levelup-tap">(touche l'écran pour continuer)</div>
+</div>
+
+<div id="boss-overlay">
+  <div class="boss-appear-title pixel-font">⚠️ UN BOSS EST APPARU ! ⚠️</div>
+  <img id="boss-appear-img" src="" alt="Boss">
+  <div class="boss-appear-tier pixel-font" id="boss-appear-tier"></div>
+  <div class="boss-appear-name pixel-font" id="boss-appear-name"></div>
+  <div class="boss-appear-challenge" id="boss-appear-challenge"></div>
+  <div class="levelup-tap">(touche l'écran pour l'affronter)</div>
 </div>
 
 <div id="exercise-modal" class="modal-overlay">
@@ -919,6 +965,42 @@
       {name:"Ouverture-fermeture des jambes en planche", muscles:"Abdominaux, abducteurs, adducteurs", how:"En position de planche, fais glisser tes pieds pour écarter puis rapprocher tes jambes tout en gardant le bassin stable."}
     ]}
   ];
+
+  // ---------- les 30 boss de Project Hugo ----------
+  // Rencontres bonus aléatoires, jamais obligatoires. tier: "commun"|"elite"|"legendaire" (déduit des récompenses)
+  const BOSSES = [
+    {id:1, icon:"🚶", name:"Le Marcheur des Plaines", challenge:"Marche pendant 10 minutes", xp:50, coins:20, tier:"commun", img:"boss-01.png"},
+    {id:2, icon:"💧", name:"Le Gardien de la Source", challenge:"Bois 500 ml d'eau", xp:40, coins:15, tier:"commun", img:"boss-02.png"},
+    {id:3, icon:"🥗", name:"Le Dévoreur de Légumes", challenge:"Ajoute une portion de légumes à ton prochain repas", xp:50, coins:20, tier:"commun", img:"boss-03.png"},
+    {id:4, icon:"🏋️", name:"Le Gobelin des Squats", challenge:"Fais 20 squats", xp:60, coins:25, tier:"commun", img:"boss-04.png"},
+    {id:5, icon:"👣", name:"Le Maître des 2 000 Pas", challenge:"Fais 2 000 pas supplémentaires aujourd'hui", xp:70, coins:30, tier:"elite", img:"boss-05.png"},
+    {id:6, icon:"🍎", name:"La Sorcière du Fruit Interdit", challenge:"Mange un fruit aujourd'hui", xp:40, coins:15, tier:"commun", img:"boss-06.png"},
+    {id:7, icon:"💪", name:"Le Géant des Pompes", challenge:"Fais 10 pompes adaptées à ton niveau", xp:60, coins:25, tier:"commun", img:"boss-07.png"},
+    {id:8, icon:"🧘", name:"Le Moine de la Souplesse", challenge:"Fais 5 minutes d'étirements", xp:50, coins:20, tier:"commun", img:"boss-08.png"},
+    {id:9, icon:"🥤", name:"Le Briseur de Sodas", challenge:"Remplace une boisson sucrée par de l'eau", xp:50, coins:20, tier:"commun", img:"boss-09.png"},
+    {id:10, icon:"🏃", name:"Le Coureur du Vent", challenge:"Fais 15 minutes d'activité physique", xp:80, coins:35, tier:"elite", img:"boss-10.png"},
+    {id:11, icon:"🍳", name:"Le Forgeron du Petit-Déjeuner", challenge:"Prépare un petit-déjeuner équilibré", xp:60, coins:25, tier:"commun", img:"boss-11.png"},
+    {id:12, icon:"🛡️", name:"Le Gardien de la Discipline", challenge:"Résiste à une envie de grignotage inutile", xp:70, coins:30, tier:"elite", img:"boss-12.png"},
+    {id:13, icon:"🏰", name:"Le Titan de l'Endurance", challenge:"Fais 30 minutes de marche cumulées", xp:100, coins:40, tier:"legendaire", img:"boss-13.png"},
+    {id:14, icon:"💧", name:"Le Dragon de l'Hydratation", challenge:"Atteins ton objectif d'hydratation de la journée", xp:80, coins:35, tier:"elite", img:"boss-14.png"},
+    {id:15, icon:"🥦", name:"Le Seigneur de l'Équilibre", challenge:"Compose un repas avec protéines + légumes + féculents", xp:80, coins:35, tier:"elite", img:"boss-15.png"},
+    {id:16, icon:"🪜", name:"Le Grimpeur des Marches", challenge:"Prends les escaliers au lieu de l'ascenseur 3 fois", xp:60, coins:25, tier:"commun", img:"boss-16.png"},
+    {id:17, icon:"⚔️", name:"Le Guerrier du Circuit", challenge:"Termine un mini-circuit de 3 exercices", xp:100, coins:40, tier:"legendaire", img:"boss-17.png"},
+    {id:18, icon:"🌙", name:"Le Veilleur du Repos", challenge:"Respecte ton heure de coucher prévue", xp:50, coins:20, tier:"commun", img:"boss-18.png"},
+    {id:19, icon:"🍽️", name:"Le Maître de la Portion", challenge:"Mange ton repas sans te resservir", xp:60, coins:25, tier:"commun", img:"boss-19.png"},
+    {id:20, icon:"🚶", name:"Le Voyageur Solitaire", challenge:"Fais une marche de 20 minutes", xp:100, coins:40, tier:"legendaire", img:"boss-20.png"},
+    {id:21, icon:"🔥", name:"Le Démon des 50 Répétitions", challenge:"Réalise 50 répétitions d'un exercice de ton choix", xp:100, coins:40, tier:"legendaire", img:"boss-21.png"},
+    {id:22, icon:"🧊", name:"Le Gardien du Frigo", challenge:"Prépare une collation saine pour éviter le grignotage", xp:60, coins:25, tier:"commun", img:"boss-22.png"},
+    {id:23, icon:"🏹", name:"L'Archer de la Précision", challenge:"Atteins ton objectif de pas quotidien", xp:100, coins:40, tier:"legendaire", img:"boss-23.png"},
+    {id:24, icon:"🧹", name:"Le Nettoyeur du Royaume", challenge:"Fais 20 minutes d'activité physique grâce aux tâches du quotidien", xp:70, coins:30, tier:"elite", img:"boss-24.png"},
+    {id:25, icon:"🥤", name:"Le Géant des 2 Litres", challenge:"Atteins 2 L d'eau dans la journée", xp:100, coins:40, tier:"legendaire", img:"boss-25.png"},
+    {id:26, icon:"🏋️", name:"Le Maître de la Force", challenge:"Fais 3 séries d'un exercice de ton choix", xp:90, coins:35, tier:"elite", img:"boss-26.png"},
+    {id:27, icon:"🥗", name:"Le Chef de la Taverne", challenge:"Prépare toi-même un repas maison équilibré", xp:100, coins:40, tier:"legendaire", img:"boss-27.png"},
+    {id:28, icon:"⚡", name:"Le Sprinteur de l'Éclair", challenge:"Fais 10 minutes d'activité intense adaptée à ton niveau", xp:100, coins:45, tier:"legendaire", img:"boss-28.png"},
+    {id:29, icon:"🧠", name:"Le Maître de la Persévérance", challenge:"Même si tu n'as pas envie, réalise une petite action positive pour ton objectif", xp:80, coins:35, tier:"elite", img:"boss-29.png"},
+    {id:30, icon:"👑", name:"Le Boss Ultime — Le Gardien de Hugo 2.0", challenge:"Réalise 3 défis différents dans la même journée", xp:200, coins:100, tier:"legendaire", img:"boss-30.png", chestLabel:"Coffre rare"}
+  ];
+  const BOSS_TIER_LABELS = {commun:"🟢 Boss Commun", elite:"🟠 Boss Élite", legendaire:"🔴 Boss Légendaire"};
 
   const MAP_ZONES = [
     {threshold:0, icon:"🌱", name:"Village du Départ", flavor:"Ton aventure commence ici.", img:"village.png.PNG"},
@@ -1165,7 +1247,9 @@
       dayBonusClaimed: {},
       forgeBonusActive: false,
       weeklyNotes: {},
-      mapZonesRevealed: {0: true}
+      mapZonesRevealed: {0: true},
+      currentBoss: null,
+      lastBossDate: null
     };
   }
 
@@ -1213,6 +1297,32 @@
     computeStreakAndBest();
     rollDailyEvent();
     checkComboMilestones();
+    rollBossSpawn();
+  }
+
+  // Fait apparaître un boss aléatoire tous les 2-3 jours environ, avec une petite
+  // chance de surprise 2 jours de suite. Jamais obligatoire, aucune pénalité si ignoré.
+  function rollBossSpawn(){
+    // un boss est déjà là, en attente d'être affronté ou ignoré
+    if(state.currentBoss && !state.currentBoss.resolved) return;
+
+    const daysSince = state.lastBossDate
+      ? Math.round((new Date(state.currentDate + "T12:00:00") - new Date(state.lastBossDate + "T12:00:00")) / 86400000)
+      : 99;
+
+    let chance = 0;
+    if(daysSince >= 3) chance = 1;
+    else if(daysSince === 2) chance = 0.6;
+    else if(daysSince === 1) chance = 0.12; // petite surprise, 2 jours de suite
+
+    if(Math.random() < chance){
+      const weights = {commun:3, elite:2, legendaire:1};
+      const pool = [];
+      BOSSES.forEach(b=>{ for(let i=0;i<weights[b.tier];i++){ pool.push(b); } });
+      const boss = pool[Math.floor(Math.random() * pool.length)];
+      state.currentBoss = {id: boss.id, date: state.currentDate, resolved:false};
+      state.lastBossDate = state.currentDate;
+    }
   }
 
   // Un jour compte comme "complet" soit parce que toutes les quêtes ont été
@@ -1240,7 +1350,6 @@
     } else {
       const roll = Math.random();
       if(roll < 0.18) type = "marchand";
-      else if(roll < 0.32) type = "boss";
     }
     state.dailyEvent = {date: state.currentDate, type, claimed:false, bonusApplied:false, bonusQuestId:null, bonusAmount:0};
   }
@@ -1326,6 +1435,19 @@
     document.getElementById("levelup-overlay").classList.remove("show");
     clearTimeout(levelupTimer);
   });
+
+  function showBossAppear(boss){
+    document.getElementById("boss-appear-img").src = boss.img;
+    document.getElementById("boss-appear-img").alt = boss.name;
+    document.getElementById("boss-appear-tier").textContent = BOSS_TIER_LABELS[boss.tier];
+    document.getElementById("boss-appear-name").textContent = boss.icon + " " + boss.name;
+    document.getElementById("boss-appear-challenge").textContent = boss.challenge;
+    document.getElementById("boss-overlay").classList.add("show");
+  }
+  document.getElementById("boss-overlay").addEventListener("click", ()=>{
+    document.getElementById("boss-overlay").classList.remove("show");
+  });
+
   let toastTimer = null;
   function showToast(msg){
     const t = document.getElementById("toast");
@@ -1705,6 +1827,7 @@
       doneBtn.style.display = "none";
     }
 
+    renderRandomBoss();
     renderEvent();
     renderChests();
   }
@@ -1811,6 +1934,53 @@
     });
   }
 
+  function renderRandomBoss(){
+    const panel = document.getElementById("random-boss-panel");
+    const card = document.getElementById("random-boss-card");
+    const cb = state.currentBoss;
+
+    if(!cb || cb.resolved){
+      panel.style.display = "none";
+      return;
+    }
+    panel.style.display = "block";
+    const boss = BOSSES.find(b => b.id === cb.id);
+    if(!boss){ panel.style.display = "none"; return; }
+
+    if(!cb.announced){
+      cb.announced = true;
+      showBossAppear(boss);
+      saveState();
+    }
+
+    card.innerHTML = `
+      <span class="boss-tier">${BOSS_TIER_LABELS[boss.tier]}</span>
+      <img src="${boss.img}" alt="${boss.name}" style="width:100%; max-width:220px; display:block; margin:0 auto 10px; border:3px solid var(--red); border-radius:2px;">
+      <h4>${boss.icon} ${boss.name}</h4>
+      <p>${boss.challenge}</p>
+      <p class="sub" style="margin-top:-6px;">🎁 Récompense : +${boss.xp} XP · +${boss.coins} 🪙${boss.chestLabel ? (" · 🎁 " + boss.chestLabel) : ""}</p>
+      <div class="btn-row">
+        <div class="btn green small" id="btn-boss-defeat">⚔️ Vaincu !</div>
+        <div class="btn small" id="btn-boss-skip">Passer</div>
+      </div>`;
+
+    document.getElementById("btn-boss-defeat").addEventListener("click", ()=>{
+      state.currentBoss.resolved = true;
+      addXP(boss.xp);
+      state.coins += boss.coins;
+      if(boss.chestLabel){ awardChest(boss.chestLabel); }
+      showToast("⚔️ " + boss.name + " vaincu ! +" + boss.xp + " XP");
+      saveState();
+      renderAll();
+    });
+    document.getElementById("btn-boss-skip").addEventListener("click", ()=>{
+      state.currentBoss.resolved = true;
+      showToast("Le boss s'évanouit dans la brume... à la prochaine !");
+      saveState();
+      renderAll();
+    });
+  }
+
   function renderEvent(){
     const panel = document.getElementById("event-panel");
     const box = document.getElementById("eventbox");
@@ -1836,26 +2006,6 @@
         state.dailyEvent.claimed = true;
         addXP(20);
         showToast("🛒 Cadeau du marchand : +20 XP");
-        renderAll();
-      });
-    } else if(ev.type === "boss"){
-      box.innerHTML = `
-        <h4>👹 INVASION DU BOSS</h4>
-        <p>Une quête bonus apparaît aujourd'hui : 12 000 pas supplémentaires.</p>
-        <div class="quest ${ev.claimed ? "checked" : ""}" id="event-boss-quest">
-          <div class="checkbox">${ev.claimed ? "✔" : ""}</div>
-          <div class="label">12 000 pas supplémentaires</div>
-          <div class="xp-pill">+75 XP</div>
-        </div>`;
-      document.getElementById("event-boss-quest").addEventListener("click", ()=>{
-        if(state.dailyEvent.claimed){
-          state.dailyEvent.claimed = false;
-          addXP(-75);
-        } else {
-          state.dailyEvent.claimed = true;
-          addXP(75);
-        }
-        saveState();
         renderAll();
       });
     } else if(ev.type === "sage"){
@@ -1928,16 +2078,18 @@
   }
 
   function renderAvatar(){
-    const levels = getLevels();
-    const li = getLevelInfo(state.weight);
-    let stageIdx = levels.findIndex(lv => lv.n === li.n);
-    if(stageIdx === -1) stageIdx = 0;
+    const prog = getXPProgress(state.xpTotal);
+    const xpLevel = prog.cur.level; // 1 à 7
     const isBoss = !!state.achievements["papaenforme"];
-    const stage = isBoss ? AVATAR_BOSS_STAGE : AVATAR_STAGES[stageIdx];
+
+    // Paliers d'images : 1=recrue, 2=aventurier, 3=guerrier, 4=champion, 5+=héros, boss=mode boss
+    const imgLevel = Math.min(xpLevel, 5);
+    const stage = isBoss ? AVATAR_BOSS_STAGE : AVATAR_STAGES[imgLevel - 1];
+    const title = isBoss ? AVATAR_BOSS_STAGE.title : ("NIVEAU " + xpLevel + " — " + prog.cur.title.toUpperCase());
 
     document.getElementById("avatar-image").src = stage.img;
     document.getElementById("avatar-image").alt = stage.title;
-    document.getElementById("avatar-title").textContent = stage.title;
+    document.getElementById("avatar-title").textContent = title;
     document.getElementById("coin-balance").textContent = state.coins;
 
     const slotsEl = document.getElementById("avatar-slots");
