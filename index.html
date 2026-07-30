@@ -635,13 +635,6 @@
           <div class="btn red small" id="btn-boss-week">⚔️ Victoire (+100 XP)</div>
         </div>
       </div>
-      <div class="bosscard">
-        <h4>🎂 Boss anniversaire — Manger du gâteau</h4>
-        <p>Aucune culpabilité. Tu reprends le programme demain.</p>
-        <div class="btn-row">
-          <div class="btn teal small" id="btn-boss-anniv">🎂 Affronté sans culpabilité</div>
-        </div>
-      </div>
     </div>
 
     <div class="panel">
@@ -1179,7 +1172,6 @@
     {id:"streak30", medal:"🔥", label:"30 jours sans abandon", xp:1000, auto:true},
     {id:"walker", medal:"👟", label:"Marcheur — 100 000 pas cumulés", xp:500, auto:true},
     {id:"warrior10", medal:"💪", label:"Guerrier — 10 séances réalisées", xp:500, auto:true},
-    {id:"balance", medal:"🍕", label:"Maître de l'équilibre — Profiter d'un repas plaisir sans culpabiliser", xp:300, auto:true},
     {id:"bossfinal", medal:"💀", label:"Le Boss final — Atteindre 88 kg", xp:2000, auto:true},
     {id:"papaenforme", medal:"👨‍👧", label:"Papa en forme — Objectif final atteint", xp:5000, auto:true}
   ];
@@ -2787,12 +2779,6 @@
     awardChest("Coffre du Guerrier");
     showToast("⚔️ Boss du samedi vaincu ! +100 XP");
     renderAll();
-  });
-
-  document.getElementById("btn-boss-anniv").addEventListener("click", ()=>{
-    showToast("🎂 Aucune culpabilité. On reprend demain !");
-    const a = ACHIEVEMENTS.find(x=>x.id==="balance");
-    if(a && !state.achievements[a.id]){ claimAchievement(a); }
   });
 
   document.getElementById("btn-draw-challenge").addEventListener("click", ()=>{
